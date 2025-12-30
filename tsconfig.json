@@ -35,10 +35,10 @@
         "src/treasury/*"
       ],
       "@home/*": [
-        "src/home/*"
+        "src/modules/home/*"
       ],
       "@inventory-control/*": [
-        "src/inventory-control/*"
+        "src/modules/inventory-control/*"
       ],
       "@client/*": [
         "src/client/*"
@@ -53,22 +53,22 @@
         "src/transporter/*"
       ],
       "@procurement/*": [
-        "src/procurement/*"
+        "src/modules/procurement/*"
       ],
       "@category/*": [
         "src/category/*"
       ],
       "@product/*": [
-        "src/product/*"
+        "src/modules/product/*"
       ],
       "@sub-category/*": [
         "src/sub-category/*"
       ],
       "@sales/*": [
-        "src/sales/*"
+        "src/modules/sales/*"
       ],
       "@tax-management/*": [
-        "src/tax-management/*"
+        "src/modules/tax-management/*"
       ]
     },
     "incremental": true,
