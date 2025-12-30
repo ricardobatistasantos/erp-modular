@@ -1,0 +1,88 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "esModuleInterop": true,
+    "module": "commonjs",
+    "declaration": true,
+    "removeComments": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "target": "esnext",
+    "sourceMap": true,
+    "outDir": "./dist",
+    "baseUrl": "./",
+    "paths": {
+      "@accounts-payable/*": [
+        "src/accounts-payable/*"
+      ],
+      "@accounts-receivable/*": [
+        "src/@accounts-receivable/*"
+      ],
+      "@bank-accounts/*": [
+        "src/bank-accounts/*"
+      ],
+      "@banks/*": [
+        "src/banks/*"
+      ],
+      "@cash-flow/*": [
+        "src/cash/*"
+      ],
+      "@payment-methods/*": [
+        "src/payment-methods/*"
+      ],
+      "@treasury/*": [
+        "src/treasury/*"
+      ],
+      "@home/*": [
+        "src/home/*"
+      ],
+      "@inventory-control/*": [
+        "src/inventory-control/*"
+      ],
+      "@client/*": [
+        "src/client/*"
+      ],
+      "@employee/*": [
+        "src/employee/*"
+      ],
+      "@supplier/*": [
+        "src/supplier/*"
+      ],
+      "@transporter/*": [
+        "src/transporter/*"
+      ],
+      "@procurement/*": [
+        "src/procurement/*"
+      ],
+      "@category/*": [
+        "src/category/*"
+      ],
+      "@product/*": [
+        "src/product/*"
+      ],
+      "@sub-category/*": [
+        "src/sub-category/*"
+      ],
+      "@sales/*": [
+        "src/sales/*"
+      ],
+      "@tax-management/*": [
+        "src/tax-management/*"
+      ]
+    },
+    "incremental": true,
+    "skipLibCheck": true,
+    "strictNullChecks": false,
+    "noImplicitAny": false,
+    "strictBindCallApply": false,
+    "forceConsistentCasingInFileNames": false,
+    "noFallthroughCasesInSwitch": false
+  },
+  "include": [
+    "src/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}
