@@ -11,7 +11,7 @@ export class AuthMiddleware implements NestMiddleware {
       return res.status(401).json({ message: 'Token not provided' });
 
     const [, token] = authHeader.split(' ');
-
+    
     try {
       const decoded = jwt.verify(
         token,

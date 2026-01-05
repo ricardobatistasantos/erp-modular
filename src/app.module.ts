@@ -18,9 +18,11 @@ import { TransporterModule } from './modules/person/transporter/src/transporter.
 import { ProcurementModule } from './modules/procurement/src/procurement.module';
 import { SalesModule } from './modules/sales/src/sales.module';
 import { TaxManagementModule } from './modules/tax-management/src/tax-management.module';
+import { AuthModule } from './modules/shared/auth/auth.module';
 
 @Module({
   imports: [
+    AuthModule,
     HomeModule,
     AccountsPayableModule,
     AccountsReceivableModule,
