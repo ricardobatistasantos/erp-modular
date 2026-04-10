@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "ignoreDeprecations": "6.0",
     "strict": true,
     "esModuleInterop": true,
     "module": "commonjs",
@@ -11,6 +12,7 @@
     "target": "esnext",
     "sourceMap": true,
     "outDir": "./dist",
+    "rootDir": "./src",
     "baseUrl": "./",
     "paths": {
       "@accounts-payable/*": [
@@ -40,17 +42,20 @@
       "@inventory-control/*": [
         "src/modules/inventory-control/*"
       ],
-      "@client/*": [
-        "src/client/*"
+      "@person/shared/*": [
+        "src/modules/person/shared/*"
       ],
-      "@employee/*": [
-        "src/employee/*"
+      "@person/client/*": [
+        "src/modules/person/client/*"
       ],
-      "@supplier/*": [
-        "src/supplier/*"
+      "@person/employee/*": [
+        "src/modules/person/employee/*"
       ],
-      "@transporter/*": [
-        "src/transporter/*"
+      "@person/supplier/*": [
+        "src/modules/person/supplier/*"
+      ],
+      "@person/transporter/*": [
+        "src/modules/person/transporter/*"
       ],
       "@procurement/*": [
         "src/modules/procurement/*"
