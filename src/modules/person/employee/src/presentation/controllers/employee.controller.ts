@@ -1,6 +1,7 @@
 import { Body, Controller, Get, Post, Put } from '@nestjs/common';
 import { CreateEmployeeUseCase } from '../../application/use-cases/create-employee.use-case';
 import { GetByIdeEUseCase } from '../../application/use-cases/get-by-id-employee.use-case';
+import { CreateEmployeeDTO } from '../../application/dto/create-employee.dto';
 
 @Controller('employee')
 export class EmployeeController {
@@ -20,7 +21,7 @@ export class EmployeeController {
   }
 
   @Post()
-  create(@Body() createEmployeeDto: any) {
+  create(@Body() createEmployeeDto: CreateEmployeeDTO) {
     return this.createEmployeeUseCase.execute(createEmployeeDto);
   }
 

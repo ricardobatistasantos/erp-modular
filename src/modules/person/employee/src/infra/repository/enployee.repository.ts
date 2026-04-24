@@ -1,28 +1,20 @@
 import { IEmployeeRepository } from "../../domain/repository/enployee.interface.repository";
 import { CreateEmployeeDTO } from "../../application/dto/create-employee.dto";
 import { Employee } from "../../domain/entity/employee.entity";
+import { Inject } from "@nestjs/common";
 
 export class EmployeeRepository implements IEmployeeRepository {
-  async create(employee: CreateEmployeeDTO): Promise<Employee> {
-    return {
-      id: "generated-id",
-      personId: "generated-person-id",
-      matricula: employee.colaborador.matricula,
-      dataAdmissao: employee.colaborador.dataAdmissao,
-      dataDemissao: employee.colaborador.dataDemissao,
-      cargo: {
-        nome: employee.colaborador.cargo.nome,
-        salario: employee.colaborador.cargo.salario,
-      },
-      departamento: {
-        nome: employee.colaborador.departamento.nome,
-      },
-      vendedor: employee.colaborador.vendedor
-        ? {
-          comissao: employee.colaborador.vendedor.comissao,
-          metaVendas: employee.colaborador.vendedor.metaVendas,
-        }
-        : undefined,
-    };
+  
+  constructor(
+    @Inject('DATABASE_CONNECTION')
+    private readonly connection: any
+  ) {}
+  
+  async create(employee: CreateEmployeeDTO, transaction: any): Promise<Employee> {
+    const db = transaction || this.connection();
+    return db.one(
+      `INSERT INTO employees (name, position, department) VALUES ($1, $2, $3) RETURNING *`,
+      [employee.pessoa.name, employee.colaborador.position, employee.colaborador.department]
+    );
   }
 }

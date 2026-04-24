@@ -1,19 +1,17 @@
 {
   "compilerOptions": {
-    "ignoreDeprecations": "6.0",
     "strict": true,
-    "esModuleInterop": true,
     "module": "commonjs",
+    "esModuleInterop": true,
     "declaration": true,
     "removeComments": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
-    "target": "esnext",
+    "target": "ES2021",
     "sourceMap": true,
     "outDir": "./dist",
-    "rootDir": "./src",
-    "baseUrl": "./",
+    "baseUrl": ".",
     "paths": {
       "@accounts-payable/*": [
         "src/accounts-payable/*"

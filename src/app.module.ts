@@ -19,10 +19,12 @@ import { ProcurementModule } from './modules/procurement/src/procurement.module'
 import { SalesModule } from './modules/sales/src/sales.module';
 import { TaxManagementModule } from './modules/tax-management/src/tax-management.module';
 import { AuthModule } from './modules/shared/auth/auth.module';
+import { DatabaseModule } from './infra/databases/pg-promise/config.module';
 
 @Module({
   imports: [
-    AuthModule,
+    // AuthModule, Descomentar aqui depois que o módulo de funcionário estiver pronto para criar o login
+    DatabaseModule,
     HomeModule,
     AccountsPayableModule,
     AccountsReceivableModule,

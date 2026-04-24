@@ -20,9 +20,9 @@ create table if not exists pessoa_juridica(
   id uuid primary key default gen_random_uuid() not null,
   pessoa_id uuid references pessoa(id),
   cnpj varchar(14) not null,
-  nome_fantasia varchar(100) not null,
-  escricao_estadual varchar(45) not null,
-  escricao_municipal varchar(45) not null,
+  nome_fantasia varchar(100) null,
+  escricao_estadual varchar(45) null,
+  escricao_municipal varchar(45) null,
   constituicao date,
   regime char(1), -- Lucro real, lucro presumido, simples nacional
   crt char(1) -- codigo de regime tributário
@@ -31,9 +31,8 @@ create table if not exists pessoa_juridica(
 create table if not exists pessoa_fisica(
   id uuid primary key default gen_random_uuid() not null,
   pessoa_id uuid references pessoa(id) not null,
-  estado_civil_id uuid references estado_civil(id) not null,
   cpf varchar(11) not null,
-  rg varchar(20) null
+  rg varchar(20) null,
   sexo char(1) not null
 );
 
@@ -53,11 +52,7 @@ create table if not exists pessoa_endereco(
   cidade varchar(100) not null,
   uf char(2) not null,
   cep varchar(8),
-  tipo_endereco varchar(100) not null, -- Residencial, Trabalho, etc
-);
-
-create table if not exists estado_civil(
-  id uuid primary key default gen_random_uuid() not null
+  tipo_endereco varchar(100) not null -- Residencial, Trabalho, etc
 );
 
 create table if not exists cliente(
@@ -72,7 +67,7 @@ create table if not exists colaborador(
   pessoa_id uuid references pessoa(id) not null,
   matricula varchar(10) not null,
   demissao date null,
-  emissao date not null,
+  admissao date not null,
   cargo_id uuid references cargo(id) not null,
   departamento_id uuid references departamento(id) not null
 );
