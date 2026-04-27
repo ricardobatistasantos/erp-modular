@@ -3,46 +3,48 @@ LISTA DE TABELAS
 PESSOAS
 
 ```sql
+CREATE TYPE tipoPessoa AS ENUM ('F', 'J'); -- J -> Jurídica f-> Física
 create table if not exists pessoa(
   id uuid primary key default gen_random_uuid() not null,
   nome varchar(100) not null,
   email varchar(50) not null,
-  tipo char(1)  not null, -- J -> Jurídica f-> Física
-  cliente char(1),
-  colaborador char(1),
-  trampostadora char(1),
-  contador char(1),
-  cadastro date not null,
-  observacao varchar(255) null
+  tipo tipoPessoa, 
+  cliente int not null default 0,
+  colaborador int not null default 0,
+  transportadora int not null default 0,
+  contador int not null default 0,
+  observacao varchar(255) null,
+  createdAt TIMESTAMP not null default now(),
+  updatedAt TIMESTAMP null
 );
+CREATE UNIQUE INDEX idx_pessoa_email_unico ON pessoa(email);
 
 create table if not exists pessoa_juridica(
   id uuid primary key default gen_random_uuid() not null,
   pessoa_id uuid references pessoa(id),
-  cnpj varchar(14) not null,
-  nome_fantasia varchar(100) null,
-  escricao_estadual varchar(45) null,
-  escricao_municipal varchar(45) null,
-  constituicao date,
-  regime char(1), -- Lucro real, lucro presumido, simples nacional
-  crt char(1) -- codigo de regime tributário
+  cnpj varchar(14) not null
 );
+CREATE UNIQUE INDEX IF NOT EXISTS idx_pessoa_juridica_cnpj_unico ON pessoa_juridica(cnpj);
+CREATE INDEX IF NOT EXISTS idx_pessoa_juridica_pessoa_id ON pessoa_juridica(pessoa_id);
 
 create table if not exists pessoa_fisica(
   id uuid primary key default gen_random_uuid() not null,
   pessoa_id uuid references pessoa(id) not null,
-  cpf varchar(11) not null,
-  rg varchar(20) null,
-  sexo char(1) not null
+  cpf varchar(11) not null
 );
+CREATE UNIQUE INDEX IF NOT EXISTS idx_pessoa_fisica_cpf_unico ON pessoa_fisica(cpf);
+CREATE INDEX IF NOT EXISTS idx_pessoa_fisica_pessoa_id ON pessoa_fisica (pessoa_id);
 
+CREATE TYPE tipoContato AS ENUM ('PESSOAL', 'TRABALHO');
 create table if not exists pessoa_contato(
   id uuid primary key default gen_random_uuid() not null,
-  tipo_contato varchar(100) not null, -- Pessoal, trabalho, etc
-  telefone varchar(100) not null,
+  tipo_contato tipoContato not null, 
+  telefone varchar(20) not null,
   pessoa_id uuid references pessoa(id) not null
 );
+CREATE INDEX IF NOT EXISTS idx_pessoa_contato_pessoa_id ON pessoa_contato (pessoa_id);
 
+CREATE TYPE tipoEndereco AS ENUM ('RESIDENCIAL', 'TRABALHO');
 create table if not exists pessoa_endereco(
   id uuid primary key default gen_random_uuid() not null,
   pessoa_id uuid references pessoa(id) not null,
@@ -52,38 +54,25 @@ create table if not exists pessoa_endereco(
   cidade varchar(100) not null,
   uf char(2) not null,
   cep varchar(8),
-  tipo_endereco varchar(100) not null -- Residencial, Trabalho, etc
+  tipo_endereco tipoEndereco not null -- Residencial, Trabalho, etc
 );
+CREATE INDEX IF NOT EXISTS idx_pessoa_endereco_pessoa_id ON pessoa_endereco (pessoa_id);
+
+create table if not exists colaborador(
+  id uuid primary key default gen_random_uuid() not null,
+  pessoa_id uuid references pessoa(id) not null,
+  matricula varchar(10) not null,
+  admissao TIMESTAMP not null default now(),
+  demissao TIMESTAMP null
+);
+CREATE INDEX IF NOT EXISTS idx_colaborador_pessoa_id ON colaborador(pessoa_id);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_colaborador_matricula_unico ON colaborador(matricula);
 
 create table if not exists cliente(
   id uuid primary key default gen_random_uuid() not null,
   pessoa_id uuid references pessoa(id) not null,
   taxa_desconto decimal(8) null,
   limit_credito decimal(8) null
-);
-
-create table if not exists colaborador(
-  id uuid primary key default gen_random_uuid() not null,
-  pessoa_id uuid references pessoa(id) not null,
-  matricula varchar(10) not null,
-  demissao date null,
-  admissao date not null,
-  cargo_id uuid references cargo(id) not null,
-  departamento_id uuid references departamento(id) not null
-);
-
-create table if not exists departamento(
-  id uuid primary key default gen_random_uuid() not null,
-  empresa_id uuid references empresa(id),
-  nome varchar(50) not null,
-  descricao varchar(200) null
-);
-
-create table if not exists cargo(
-  id uuid primary key default gen_random_uuid() not null,
-  nome varchar(50) not null,
-  salario decimal(18,6) not null
-  descricao varchar(200) null
 );
 
 create table if not exists vendedor(

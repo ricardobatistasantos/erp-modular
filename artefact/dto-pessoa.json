@@ -1,34 +1,38 @@
 {
-  "nome": "João",
-  "email": "ricardobatista@teste.com",
-  "tipo": "F/J",
-  "fisica": {
-    "cpf": "123.456.789-00"
-  },
-  "juridica": {
-    "cnpj": "12.345.678/0001-00"
-  },
-  "contatos": [
-    {
-      "tipo": "Pessoal",
-      "telefone": "(11) 98765-4321"
+  "pessoa":{
+    "nome": "João",
+    "email": "ricardobatista@teste.com",
+    "tipo": "F/J",
+    "fisica": {
+      "cpf": "123.456.789-00"
     },
-    {
-      "tipo": "trabalho",
-      "telefone": "(11) 98765-4321"
-    }
-  ],
-  "enderecos": [
-    {
-      "logradouro": "Rua das Flores",
-      "numero": 123,
-      "bairro": "Jardim das Rosas",
-      "cidade": "São Paulo",
-      "uf": "SP",
-      "cep": "01234-567",
-      "tipoEndereco": "Residencial"
-    }
-  ],
+    "juridica": {
+      "cnpj": "12.345.678/0001-00"
+    },
+    "contatos": [
+      {
+        "tipo": "Pessoal",
+        "telefone": "(11) 98765-4321"
+      },
+      {
+        "tipo": "trabalho",
+        "telefone": "(11) 98765-4321"
+      }
+    ],
+    "enderecos": [
+      {
+        "logradouro": "Rua das Flores",
+        "numero": 123,
+        "bairro": "Jardim das Rosas",
+        "cidade": "São Paulo",
+        "uf": "SP",
+        "cep": "01234-567",
+        "tipoEndereco": "Residencial"
+      }
+    ],
+    "cadastro":"2024-06-01",
+    "observacao": ""
+  },
   "cliente": {
     "taxa_desconto": 0.1,
     "limit_credito": 10000
@@ -49,6 +53,5 @@
       "metaVendas": 100000.00
     }
   },
-  "cadastro": "2024-06-01",
-  "observacao": ""
+  "createUser":true
 }

@@ -1,7 +1,7 @@
 export class EmployeeDTO  {
   
     matricula: string;
-    dataAdmissao: Date;
+    dataAdmissao?: Date;
     dataDemissao?: Date;
 
     cargo: {
