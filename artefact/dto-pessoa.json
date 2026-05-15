@@ -11,11 +11,11 @@
     },
     "contatos": [
       {
-        "tipo": "Pessoal",
+        "tipo": "PESSOAL",
         "telefone": "(11) 98765-4321"
       },
       {
-        "tipo": "trabalho",
+        "tipo": "TRABALHO",
         "telefone": "(11) 98765-4321"
       }
     ],
@@ -26,32 +26,32 @@
         "bairro": "Jardim das Rosas",
         "cidade": "São Paulo",
         "uf": "SP",
-        "cep": "01234-567",
-        "tipoEndereco": "Residencial"
+        "cep": "77814-812",
+        "tipoEndereco": "RESIDENCIAL"
       }
     ],
     "cadastro":"2024-06-01",
     "observacao": ""
   },
-  "cliente": {
-    "taxa_desconto": 0.1,
-    "limit_credito": 10000
-  },
   "colaborador": {
-    "matricula": "12345",
-    "demissao": "2024-06-01",
-    "emissao": "2024-06-01",
+    "matricula": "12348",
     "cargo": {
+      "id":"id-cargo",
       "nome": "Desenvolvedor de Software",
       "salario": 5000.00
     },
     "departamento": {
+      "id":"id-departamento",
       "nome": "Tecnologia da Informação"
     },
     "vendedor": {
       "comissao": 0.05,
       "metaVendas": 100000.00
     }
+  },
+  "cliente": {
+    "taxaDesconto": 0.1,
+    "limiteCredito": 10000
   },
   "createUser":true
 }

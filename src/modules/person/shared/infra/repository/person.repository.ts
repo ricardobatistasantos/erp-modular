@@ -8,6 +8,8 @@ export class PersonRepository implements IPersonRepository {
   ) { }
 
   async create(data: any, transaction?: any): Promise<any> {
+    let colaborador = data.employee || 0;
+    let cliente = data.client || 0;
     const db = transaction || this.connection();
     return db.one(`
       insert
@@ -17,14 +19,16 @@ export class PersonRepository implements IPersonRepository {
         email,
         tipo,
         colaborador,
+        cliente,
         observacao)
-      values ($1,$2,$3,$4,$5)
+      values ($1,$2,$3,$4,$5,$6)
       returning *`,
       [
         data.nome,
         data.email,
-        data.tipo.toUpperCase(),
-        1,
+        data.tipo,
+        colaborador,
+        cliente,
         data.observacao
       ]);
   }

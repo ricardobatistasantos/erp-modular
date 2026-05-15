@@ -1,17 +1,14 @@
 import { Inject } from '@nestjs/common';
 
-// import { IPersonJuridicaRepository } from '@person/shared/domain/repository/person-juridica-interface.repository';
-// import { IPersonFisicaRepository } from '@person/shared/domain/repository/person-fisica-interface.repository';
+import { IPersonJuridicaRepository } from '@person/shared/domain/repository/person-juridica-interface.repository';
+import { IPersonFisicaRepository } from '@person/shared/domain/repository/person-fisica-interface.repository';
+import { IAddressRepository } from '@person/shared/domain/repository/person-address-interface.repository';
+import { IContactRepository } from '@person/shared/domain/repository/person-contact-interface.repository';
 import { IPersonRepository } from '@person/shared/domain/repository/person-interface.repository';
-// import { IEmployeeRepository } from '../../domain/repository/enployee.interface.repository';
+import { IEmployeeRepository } from '../../domain/repository/enployee.interface.repository';
 // import { RabbitMQMananger } from 'src/infra/queue/rabbit-mq-manager';
 import { BaseUseCase } from '../../domain/use-case/base.use-case';
 import { CreateEmployeeDTO } from '../dto/create-employee.dto';
-import { IPersonFisicaRepository } from '@person/shared/domain/repository/person-fisica-interface.repository';
-import { IPersonJuridicaRepository } from '@person/shared/domain/repository/person-juridica-interface.repository';
-import { IContactRepository } from '@person/shared/domain/repository/person-contact-interface.repository';
-import { IAddressRepository } from '@person/shared/domain/repository/person-address-interface.repository';
-import { IEmployeeRepository } from '../../domain/repository/enployee.interface.repository';
 
 export class CreateEmployeeUseCase implements BaseUseCase<CreateEmployeeDTO, any> {
 
@@ -36,8 +33,8 @@ export class CreateEmployeeUseCase implements BaseUseCase<CreateEmployeeDTO, any
 
   async execute(data: CreateEmployeeDTO) {
     try {
-      const result = await this.connection().tx('Create Employee Person', async (transaction) => {
-        const person = await this.personRepository.create(data.pessoa, transaction);
+      const enployeeCreated = await this.connection().tx('Create Employee Person', async (transaction) => {
+        const person = await this.personRepository.create({ employee: 1, ...data.pessoa }, transaction);
 
         if (data.pessoa.tipo === 'F' && data.pessoa.fisica)
           await this.personFisicaRepository.create({ pessoaId: person.id, ...data.pessoa.fisica }, transaction);
@@ -65,17 +62,15 @@ export class CreateEmployeeUseCase implements BaseUseCase<CreateEmployeeDTO, any
       });
 
       if (data.createUser)
-        console.log('Creating user for employee:', result.nome);
+        console.log('Creating user for employee:', enployeeCreated.nome);
       //   this.rabbitQueue.publish('employee_exchange', 'employee.created', JSON.stringify({
       //     id: employee.id,
       //     personId: employee.personId,
       //     name: data.pessoa.nome,
       //     email: data.pessoa.email,
-      //     cargo: employee.cargo,
-      //     departamento: employee.departamento
       //   }));
-      console.log('Employee created successfully:', result);
-      return result;
+      console.log('Employee created successfully:', enployeeCreated);
+      return enployeeCreated;
     } catch (error) {
       console.log(error)
     }

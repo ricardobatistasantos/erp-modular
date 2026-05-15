@@ -1,6 +1,7 @@
 import { Body, Controller, Get, Post, Put } from '@nestjs/common';
-import { CreateClientUseCase } from '../../application/use-cases/create-client.use-case';
 import { GetByIdClientUseCase } from '../../application/use-cases/get-by-id-client.use-case';
+import { CreateClientUseCase } from '../../application/use-cases/create-client.use-case';
+import { CreateClientDTO } from '../../application/dto/create-client.dto';
 
 @Controller('client')
 export class ClientController {
@@ -20,7 +21,7 @@ export class ClientController {
   }
 
   @Post()
-  create(@Body() createClientDto: any) {
+  create(@Body() createClientDto: CreateClientDTO) {
     return this.createClientUseCase.execute(createClientDto);
   }
 
