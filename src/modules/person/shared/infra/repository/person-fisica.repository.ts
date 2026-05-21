@@ -21,4 +21,17 @@ export class PersonFisicaRepository implements IPersonFisicaRepository {
         data.cpf.replace(/\D/g, '')
       ]);
   }
+
+  async update(pessoaId: string, data: any, transaction?: any): Promise<any> {
+    const db = transaction || this.connection();
+    return db.one(`
+      UPDATE pessoa_fisica
+      SET cpf = COALESCE($2, cpf)
+      WHERE pessoa_id = $1
+      RETURNING *`,
+      [
+        pessoaId,
+        data.cpf ? data.cpf.replace(/\D/g, '') : null
+      ]);
+  }
 }

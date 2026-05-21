@@ -1,23 +1,26 @@
-import { Body, Controller, Get, Post, Put } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, Query } from '@nestjs/common';
 import { CreateEmployeeUseCase } from '../../application/use-cases/create-employee.use-case';
 import { GetByIdeEUseCase } from '../../application/use-cases/get-by-id-employee.use-case';
+import { FindAllEmployeesUseCase } from '../../application/use-cases/find-all-employees.use-case';
 import { CreateEmployeeDTO } from '../../application/dto/create-employee.dto';
+import { PaginationQueryDTO } from '../../application/dto/pagination-query.dto';
 
 @Controller('employee')
 export class EmployeeController {
   constructor(
     private readonly createEmployeeUseCase: CreateEmployeeUseCase,
     private readonly getByIdeEUseCase: GetByIdeEUseCase,
+    private readonly findAllEmployeesUseCase: FindAllEmployeesUseCase,
   ) {}
 
   @Get(':id')
-  getEmployeeById() {
-    return this.getByIdeEUseCase.execute({ id: 'some-id' });
+  getEmployeeById(@Param('id') id: string) {
+    return this.getByIdeEUseCase.execute({ id });
   }
 
   @Get()
-  findAll() {
-    return 'All employee';
+  findAll(@Query() query: PaginationQueryDTO) {
+    return this.findAllEmployeesUseCase.execute(query);
   }
 
   @Post()

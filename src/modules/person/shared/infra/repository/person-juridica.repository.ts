@@ -21,4 +21,17 @@ export class PersonJuridicaRepository implements IPersonJuridicaRepository {
         data.cnpj.replace(/\D/g, '')
       ]);
   }
+
+  async update(pessoaId: string, data: any, transaction?: any): Promise<any> {
+    const db = transaction || this.connection();
+    return db.one(`
+      UPDATE pessoa_juridica
+      SET cnpj = COALESCE($2, cnpj)
+      WHERE pessoa_id = $1
+      RETURNING *`,
+      [
+        pessoaId,
+        data.cnpj ? data.cnpj.replace(/\D/g, '') : null
+      ]);
+  }
 }

@@ -15,4 +15,6 @@ export class Employee {
   departamento: Department;
 
   vendedor?: SalesProfile;
+
+  updatedAt?: Date;
 }

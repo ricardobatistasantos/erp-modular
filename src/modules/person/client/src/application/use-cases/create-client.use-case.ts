@@ -56,7 +56,6 @@ export class CreateClientUseCase implements BaseUseCase<any, any> {
           );
 
         await this.clientRepository.create({ pessoaId: person.id, ...data.cliente }, transaction);
-        // await this.employeeRepository.create({ pessoaId: person.id, ...data.colaborador }, transaction);
         
         return person;
       });

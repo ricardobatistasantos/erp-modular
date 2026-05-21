@@ -24,4 +24,9 @@ export class ContactRepository implements IContactRepository {
         data.telefone
       ]);
   }
+
+  async deleteByPessoaId(pessoaId: string, transaction?: any): Promise<void> {
+    const db = transaction || this.connection();
+    await db.none(`DELETE FROM pessoa_contato WHERE pessoa_id = $1`, [pessoaId]);
+  }
 }

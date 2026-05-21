@@ -6,7 +6,9 @@ import { IAddressRepository } from '@person/shared/domain/repository/person-addr
 import { IContactRepository } from '@person/shared/domain/repository/person-contact-interface.repository';
 import { IPersonRepository } from '@person/shared/domain/repository/person-interface.repository';
 import { IEmployeeRepository } from '../../domain/repository/enployee.interface.repository';
-// import { RabbitMQMananger } from 'src/infra/queue/rabbit-mq-manager';
+import { IJobPositionRepository } from '../../domain/repository/job-position.interface.repository';
+import { IDepartmentRepository } from '../../domain/repository/department.interface.repository';
+import { RabbitMQMananger } from 'src/infra/queue/rabbit-mq-manager';
 import { BaseUseCase } from '../../domain/use-case/base.use-case';
 import { CreateEmployeeDTO } from '../dto/create-employee.dto';
 
@@ -27,8 +29,12 @@ export class CreateEmployeeUseCase implements BaseUseCase<CreateEmployeeDTO, any
     private readonly addressRepository: IAddressRepository,
     @Inject('IEmployeeRepository')
     private readonly employeeRepository: IEmployeeRepository,
-    // @Inject('RABBIT_MQ')
-    // private readonly rabbitQueue: RabbitMQMananger
+    @Inject('IJobPositionRepository')
+    private readonly jobPositionRepository: IJobPositionRepository,
+    @Inject('IDepartmentRepository')
+    private readonly departmentRepository: IDepartmentRepository,
+    @Inject('RABBIT_MQ')
+    private readonly rabbitQueue: RabbitMQMananger
   ) { }
 
   async execute(data: CreateEmployeeDTO) {
@@ -56,19 +62,40 @@ export class CreateEmployeeUseCase implements BaseUseCase<CreateEmployeeDTO, any
             )
           );
 
-        await this.employeeRepository.create({ pessoaId: person.id, ...data.colaborador }, transaction);
+        let cargoId: string | undefined;
+        let departamentoId: string | undefined;
+
+        if (data.colaborador.cargo) {
+          const cargo = await this.jobPositionRepository.create(data.colaborador.cargo, transaction);
+          cargoId = cargo.id;
+        }
+
+        if (data.colaborador.departamento) {
+          const departamento = await this.departmentRepository.create(data.colaborador.departamento, transaction);
+          departamentoId = departamento.id;
+        }
+
+        await this.employeeRepository.create({
+          pessoaId: person.id,
+          matricula: data.colaborador.matricula,
+          cargoId,
+          departamentoId,
+        }, transaction);
 
         return person;
       });
 
-      if (data.createUser)
-        console.log('Creating user for employee:', enployeeCreated.nome);
-      //   this.rabbitQueue.publish('employee_exchange', 'employee.created', JSON.stringify({
-      //     id: employee.id,
-      //     personId: employee.personId,
-      //     name: data.pessoa.nome,
-      //     email: data.pessoa.email,
-      //   }));
+      if (data.createUser) {
+        await this.rabbitQueue.connect();
+        await this.rabbitQueue.assertExchange('employee_exchange', 'direct', { durable: true });
+        await this.rabbitQueue.publish('employee_exchange', 'employee.created', JSON.stringify({
+          id: enployeeCreated.id,
+          personId: enployeeCreated.id,
+          nome: data.pessoa.nome,
+          email: data.pessoa.email,
+        }));
+      }
+
       console.log('Employee created successfully:', enployeeCreated);
       return enployeeCreated;
     } catch (error) {

@@ -32,4 +32,21 @@ export class PersonRepository implements IPersonRepository {
         data.observacao
       ]);
   }
+
+  async update(id: string, data: any, transaction?: any): Promise<any> {
+    const db = transaction || this.connection();
+    return db.one(`
+      UPDATE pessoa
+      SET nome = COALESCE($2, nome),
+          email = COALESCE($3, email),
+          observacao = COALESCE($4, observacao)
+      WHERE id = $1
+      RETURNING *`,
+      [
+        id,
+        data.nome ?? null,
+        data.email ?? null,
+        data.observacao ?? null
+      ]);
+  }
 }

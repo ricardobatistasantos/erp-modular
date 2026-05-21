@@ -34,4 +34,9 @@ export class AddressRepository implements IAddressRepository {
         data.cep.replace(/\D/g, '')
       ]);
   }
+
+  async deleteByPessoaId(pessoaId: string, transaction?: any): Promise<void> {
+    const db = transaction || this.connection();
+    await db.none(`DELETE FROM pessoa_endereco WHERE pessoa_id = $1`, [pessoaId]);
+  }
 }
