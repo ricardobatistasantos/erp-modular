@@ -6,12 +6,18 @@ import { EmployeeModule } from './modules/person/employee/src/employee.module';
 import { ProductModule } from './modules/product/product/src/product.module';
 import { CategoryModule } from './modules/product/category/src/category.module';
 import { SubCategoryModule } from './modules/product/sub-category/src/sub-category.module';
+import { ChartOfAccountsModule } from './modules/finance/chart-of-accounts/src/chart-of-accounts.module';
+import { CostCentersModule } from './modules/finance/cost-centers/src/cost-centers.module';
+import { FinancialCategoriesModule } from './modules/finance/financial-categories/src/financial-categories.module';
 import { AccountsPayableModule } from './modules/finance/accounts-payable/src/accounts-payable.module';
 import { AccountsReceivableModule } from './modules/finance/accounts-receivable/src/accounts-receivable.module';
+import { InstallmentsModule } from './modules/finance/installments/src/installments.module';
+import { FinancialEntriesModule } from './modules/finance/financial-entries/src/financial-entries.module';
+import { FinancialSettlementsModule } from './modules/finance/financial-settlements/src/financial-settlements.module';
+import { PaymentMethodsModule } from './modules/finance/payment-methods/src/payment-methods.module';
 import { BankAccountsModule } from './modules/finance/bank-accounts/src/bank-accounts.module';
 import { BanksModule } from './modules/finance/banks/src/banks.module';
 import { CashFlowModule } from './modules/finance/cash-flow/src/cash-flow.module';
-import { PaymentMethodsModule } from './modules/finance/payment-methods/src/payment-methods.module';
 import { TreasuryModule } from './modules/finance/treasury/src/treasury.module';
 import { InventoryControlModule } from './modules/inventory-control/src/inventory-control.module';
 import { TransporterModule } from './modules/person/transporter/src/transporter.module';
@@ -26,12 +32,18 @@ import { DatabaseModule } from './infra/databases/pg-promise/config.module';
     // AuthModule, Descomentar aqui depois que o módulo de funcionário estiver pronto para criar o login
     DatabaseModule,
     HomeModule,
+    ChartOfAccountsModule,
+    CostCentersModule,
+    FinancialCategoriesModule,
     AccountsPayableModule,
     AccountsReceivableModule,
+    InstallmentsModule,
+    FinancialEntriesModule,
+    FinancialSettlementsModule,
+    PaymentMethodsModule,
     BankAccountsModule,
     BanksModule,
     CashFlowModule,
-    PaymentMethodsModule,
     TreasuryModule,
     InventoryControlModule,
     ClientModule,

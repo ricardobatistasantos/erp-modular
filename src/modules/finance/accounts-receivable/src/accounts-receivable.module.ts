@@ -1,14 +1,31 @@
 import { Module } from '@nestjs/common';
+import { DatabaseModule } from '../../../../infra/databases/pg-promise/config.module';
 import { AccountsReceivableController } from './presentation/controllers/accounts-receivable.controller';
-import { CreateAccountsReceivableUseCase } from './application/use-cases/create-accounts-receivable.use-case';
-import { GetByIdAccountsReceivableUseCase } from './application/use-cases/get-by-id-accounts-receivable.use-case';
+import { AccountReceivableRepository } from './infra/repository/account-receivable.repository';
+import { CreateAccountReceivableUseCase } from './application/use-cases/create-account-receivable.use-case';
+import { GetByIdAccountReceivableUseCase } from './application/use-cases/get-by-id-account-receivable.use-case';
+import { FindAllAccountReceivablesUseCase } from './application/use-cases/find-all-account-receivables.use-case';
+import { UpdateAccountReceivableUseCase } from './application/use-cases/update-account-receivable.use-case';
 
 @Module({
-  imports: [],
+  imports: [DatabaseModule],
   controllers: [AccountsReceivableController],
   providers: [
-    CreateAccountsReceivableUseCase,
-    GetByIdAccountsReceivableUseCase,
+    {
+      provide: 'IAccountReceivableRepository',
+      useClass: AccountReceivableRepository,
+    },
+    CreateAccountReceivableUseCase,
+    GetByIdAccountReceivableUseCase,
+    FindAllAccountReceivablesUseCase,
+    UpdateAccountReceivableUseCase,
+  ],
+  exports: [
+    CreateAccountReceivableUseCase,
+    GetByIdAccountReceivableUseCase,
+    FindAllAccountReceivablesUseCase,
+    UpdateAccountReceivableUseCase,
+    'IAccountReceivableRepository',
   ],
 })
 export class AccountsReceivableModule {}

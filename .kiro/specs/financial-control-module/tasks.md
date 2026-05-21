@@ -6,20 +6,20 @@ Implementação completa do módulo de controle financeiro seguindo a arquitetur
 
 ## Tasks
 
-- [ ] 1. Implementar submódulo Plano de Contas (chart-of-accounts)
-  - [-] 1.1 Criar entidade, interface de repositório e BaseUseCase
+- [x] 1. Implementar submódulo Plano de Contas (chart-of-accounts)
+  - [x] 1.1 Criar entidade, interface de repositório e BaseUseCase
     - Criar `src/modules/finance/chart-of-accounts/src/domain/entity/chart-of-accounts.entity.ts` com a classe ChartOfAccounts (id, codigo, nome, tipo, natureza, contaPaiId, aceitaLancamento, ativo, createdAt, updatedAt)
     - Criar `src/modules/finance/chart-of-accounts/src/domain/repository/chart-of-accounts.interface.repository.ts` com IChartOfAccountsRepository (create, findById, findAll, update, findByCodigo)
     - Criar `src/modules/finance/chart-of-accounts/src/domain/use-case/base.use-case.ts` com interface BaseUseCase<I, O>
     - _Requisitos: 1.1, 1.2, 2.6_
 
-  - [~] 1.2 Criar DTOs do Plano de Contas
+  - [x] 1.2 Criar DTOs do Plano de Contas
     - Criar `src/modules/finance/chart-of-accounts/src/application/dto/create-chart-of-accounts.dto.ts` com campos obrigatórios (codigo, nome, tipo, natureza, aceitaLancamento) e opcional (contaPaiId)
     - Criar `src/modules/finance/chart-of-accounts/src/application/dto/update-chart-of-accounts.dto.ts` com todos os campos opcionais
     - Criar `src/modules/finance/chart-of-accounts/src/application/dto/pagination-query.dto.ts` com page (padrão 1) e limit (padrão 10)
     - _Requisitos: 11.1, 11.2, 11.3, 11.4_
 
-  - [~] 1.3 Implementar repositório pg-promise do Plano de Contas
+  - [x] 1.3 Implementar repositório pg-promise do Plano de Contas
     - Criar `src/modules/finance/chart-of-accounts/src/infra/repository/chart-of-accounts.repository.ts`
     - Injetar 'DATABASE_CONNECTION' via construtor
     - Implementar create com INSERT RETURNING usando gen_random_uuid()
@@ -30,14 +30,14 @@ Implementação completa do módulo de controle financeiro seguindo a arquitetur
     - Aceitar parâmetro transaction opcional em create e update
     - _Requisitos: 12.1, 12.2, 12.3, 12.4, 12.5, 12.6_
 
-  - [~] 1.4 Implementar use-cases do Plano de Contas
+  - [x] 1.4 Implementar use-cases do Plano de Contas
     - Criar CreateChartOfAccountsUseCase com validação de codigo duplicado (409) e contaPaiId inválido (400)
     - Criar GetByIdChartOfAccountsUseCase com tratamento de 404
     - Criar FindAllChartOfAccountsUseCase com paginação e valores padrão
     - Criar UpdateChartOfAccountsUseCase com validação de existência (404) e campos inválidos (400)
     - _Requisitos: 2.1, 2.2, 2.3, 2.4, 2.5, 2.7, 2.8_
 
-  - [~] 1.5 Implementar controller e módulo NestJS do Plano de Contas
+  - [x] 1.5 Implementar controller e módulo NestJS do Plano de Contas
     - Criar `src/modules/finance/chart-of-accounts/src/presentation/controllers/chart-of-accounts.controller.ts` com rotas POST, GET /:id, GET (lista), PUT /:id
     - Criar `src/modules/finance/chart-of-accounts/src/chart-of-accounts.module.ts` registrando providers com tokens string
     - Exportar use-cases para uso por outros módulos
@@ -57,33 +57,33 @@ Implementação completa do módulo de controle financeiro seguindo a arquitetur
     - _Requisitos: 2.5, 2.7, 2.8_
 
 
-- [ ] 2. Implementar submódulo Centro de Custos (cost-centers)
-  - [-] 2.1 Criar entidade, interface de repositório e BaseUseCase
+- [x] 2. Implementar submódulo Centro de Custos (cost-centers)
+  - [x] 2.1 Criar entidade, interface de repositório e BaseUseCase
     - Criar `src/modules/finance/cost-centers/src/domain/entity/cost-center.entity.ts` com a classe CostCenter (id, codigo, nome, descricao, centroPaiId, ativo, createdAt, updatedAt)
     - Criar `src/modules/finance/cost-centers/src/domain/repository/cost-center.interface.repository.ts` com ICostCenterRepository (create, findById, findAll, update, findByCodigo)
     - Criar `src/modules/finance/cost-centers/src/domain/use-case/base.use-case.ts`
     - _Requisitos: 1.1, 1.2, 3.6_
 
-  - [~] 2.2 Criar DTOs do Centro de Custos
+  - [x] 2.2 Criar DTOs do Centro de Custos
     - Criar CreateCostCenterDTO com campos obrigatórios (codigo, nome) e opcionais (descricao, centroPaiId)
     - Criar UpdateCostCenterDTO com todos os campos opcionais
     - Criar PaginationQueryDTO com page e limit
     - _Requisitos: 11.1, 11.2, 11.3, 11.4_
 
-  - [~] 2.3 Implementar repositório pg-promise do Centro de Custos
+  - [x] 2.3 Implementar repositório pg-promise do Centro de Custos
     - Criar `src/modules/finance/cost-centers/src/infra/repository/cost-center.repository.ts`
     - Implementar CRUD com queries parametrizadas, COALESCE no update, paginação LIMIT/OFFSET
     - Implementar findByCodigo para verificação de unicidade
     - _Requisitos: 12.1, 12.2, 12.3, 12.4, 12.5, 12.6_
 
-  - [~] 2.4 Implementar use-cases do Centro de Custos
+  - [x] 2.4 Implementar use-cases do Centro de Custos
     - Criar CreateCostCenterUseCase com validação de codigo duplicado (409) e centroPaiId inválido (400)
     - Criar GetByIdCostCenterUseCase com tratamento de 404
     - Criar FindAllCostCentersUseCase com paginação
     - Criar UpdateCostCenterUseCase com validação de existência (404)
     - _Requisitos: 3.1, 3.2, 3.3, 3.4, 3.5, 3.7, 3.8, 3.9_
 
-  - [~] 2.5 Implementar controller e módulo NestJS do Centro de Custos
+  - [x] 2.5 Implementar controller e módulo NestJS do Centro de Custos
     - Criar controller com rotas POST, GET /:id, GET (lista), PUT /:id
     - Criar cost-centers.module.ts registrando providers e exportando use-cases
     - _Requisitos: 13.1, 13.2, 13.3, 13.4, 13.5_
@@ -99,25 +99,25 @@ Implementação completa do módulo de controle financeiro seguindo a arquitetur
     - _Requisitos: 3.5, 3.7, 3.8, 3.9_
 
 
-- [ ] 3. Implementar submódulo Categorias Financeiras (financial-categories)
-  - [~] 3.1 Criar entidade, interface de repositório e BaseUseCase
+- [x] 3. Implementar submódulo Categorias Financeiras (financial-categories)
+  - [x] 3.1 Criar entidade, interface de repositório e BaseUseCase
     - Criar `src/modules/finance/financial-categories/src/domain/entity/financial-category.entity.ts` com a classe FinancialCategory (id, nome, descricao, tipo, planoContaId, ativo, createdAt, updatedAt)
     - Criar `src/modules/finance/financial-categories/src/domain/repository/financial-category.interface.repository.ts` com IFinancialCategoryRepository
     - Criar `src/modules/finance/financial-categories/src/domain/use-case/base.use-case.ts`
     - _Requisitos: 1.1, 1.2, 4.8_
 
-  - [~] 3.2 Criar DTOs das Categorias Financeiras
+  - [x] 3.2 Criar DTOs das Categorias Financeiras
     - Criar CreateFinancialCategoryDTO com campos obrigatórios (nome, tipo) e opcionais (descricao, planoContaId)
     - Criar UpdateFinancialCategoryDTO com todos os campos opcionais incluindo ativo
     - Criar PaginationQueryDTO
     - _Requisitos: 11.1, 11.2, 11.3, 11.4_
 
-  - [~] 3.3 Implementar repositório pg-promise das Categorias Financeiras
+  - [x] 3.3 Implementar repositório pg-promise das Categorias Financeiras
     - Criar `src/modules/finance/financial-categories/src/infra/repository/financial-category.repository.ts`
     - Implementar CRUD com queries parametrizadas, COALESCE no update, paginação LIMIT/OFFSET
     - _Requisitos: 12.1, 12.2, 12.3, 12.4, 12.5, 12.6_
 
-  - [~] 3.4 Implementar use-cases das Categorias Financeiras
+  - [x] 3.4 Implementar use-cases das Categorias Financeiras
     - Criar CreateFinancialCategoryUseCase com validação de planoContaId existente (422 se inválido)
     - Criar GetByIdFinancialCategoryUseCase com tratamento de 404
     - Criar FindAllFinancialCategoriesUseCase com paginação
@@ -125,7 +125,7 @@ Implementação completa do módulo de controle financeiro seguindo a arquitetur
     - Injetar IChartOfAccountsRepository para validar planoContaId
     - _Requisitos: 4.1, 4.2, 4.3, 4.4, 4.5, 4.6, 4.7_
 
-  - [~] 3.5 Implementar controller e módulo NestJS das Categorias Financeiras
+  - [x] 3.5 Implementar controller e módulo NestJS das Categorias Financeiras
     - Criar controller com rotas POST, GET /:id, GET (lista), PUT /:id
     - Criar financial-categories.module.ts importando ChartOfAccountsModule para acesso ao repositório
     - _Requisitos: 13.1, 13.2, 13.3, 13.4, 13.5, 13.6_
@@ -139,38 +139,38 @@ Implementação completa do módulo de controle financeiro seguindo a arquitetur
     - Testar cenário 404, 422 (planoContaId inexistente), 400 (campos inválidos)
     - _Requisitos: 4.2, 4.3, 4.7_
 
-- [~] 4. Checkpoint - Verificar submódulos base
+- [x] 4. Checkpoint - Verificar submódulos base
   - Garantir que todos os testes passam para Plano de Contas, Centro de Custos e Categorias Financeiras. Perguntar ao usuário se há dúvidas.
 
 
-- [ ] 5. Implementar submódulo Contas a Pagar (accounts-payable)
-  - [~] 5.1 Criar entidade, interface de repositório e BaseUseCase
+- [x] 5. Implementar submódulo Contas a Pagar (accounts-payable)
+  - [x] 5.1 Criar entidade, interface de repositório e BaseUseCase
     - Criar `src/modules/finance/accounts-payable/src/domain/entity/account-payable.entity.ts` com a classe AccountPayable (id, pessoaId, numeroDocumento, descricao, categoriaFinanceiraId, centroCustoId, contaBancariaId, dataEmissao, dataVencimento, valor, valorPago, status, formaPagamento, createdAt, updatedAt)
     - Criar `src/modules/finance/accounts-payable/src/domain/repository/account-payable.interface.repository.ts` com IAccountPayableRepository (create, findById, findAll, update, updateValorPago)
     - Substituir o base.use-case.ts existente mantendo a mesma interface
     - _Requisitos: 1.1, 1.2, 5.6_
 
-  - [~] 5.2 Criar DTOs de Contas a Pagar
+  - [x] 5.2 Criar DTOs de Contas a Pagar
     - Criar CreateAccountPayableDTO com campos obrigatórios (pessoaId, numeroDocumento, descricao, categoriaFinanceiraId, dataEmissao, dataVencimento, valor) e opcionais (centroCustoId, contaBancariaId, formaPagamento)
     - Criar UpdateAccountPayableDTO com todos os campos opcionais
     - Criar PaginationQueryDTO
     - _Requisitos: 11.1, 11.2, 11.3_
 
-  - [~] 5.3 Implementar repositório pg-promise de Contas a Pagar
+  - [x] 5.3 Implementar repositório pg-promise de Contas a Pagar
     - Criar `src/modules/finance/accounts-payable/src/infra/repository/account-payable.repository.ts`
     - Implementar create com status='PENDENTE' e valor_pago=0 por padrão
     - Implementar findById, findAll com paginação, update com COALESCE
     - Implementar updateValorPago para atualizar valor_pago e status atomicamente
     - _Requisitos: 12.1, 12.2, 12.3, 12.4, 12.5, 12.6_
 
-  - [~] 5.4 Implementar use-cases de Contas a Pagar
+  - [x] 5.4 Implementar use-cases de Contas a Pagar
     - Criar CreateAccountPayableUseCase com validação de data_vencimento >= data_emissao e campos obrigatórios
     - Criar GetByIdAccountPayableUseCase com tratamento de 404
     - Criar FindAllAccountPayablesUseCase com paginação
     - Criar UpdateAccountPayableUseCase com validação de existência e datas
     - _Requisitos: 5.1, 5.2, 5.3, 5.4, 5.5, 5.7, 5.8, 5.9_
 
-  - [~] 5.5 Implementar controller e módulo NestJS de Contas a Pagar
+  - [x] 5.5 Implementar controller e módulo NestJS de Contas a Pagar
     - Substituir o controller existente com implementação completa (POST, GET /:id, GET lista, PUT /:id)
     - Atualizar accounts-payable.module.ts com providers corretos
     - Exportar use-cases para uso pelo módulo de Baixas Financeiras
@@ -186,34 +186,34 @@ Implementação completa do módulo de controle financeiro seguindo a arquitetur
     - _Requisitos: 5.5, 5.8, 5.9_
 
 
-- [ ] 6. Implementar submódulo Contas a Receber (accounts-receivable)
-  - [~] 6.1 Criar entidade, interface de repositório e BaseUseCase
+- [x] 6. Implementar submódulo Contas a Receber (accounts-receivable)
+  - [x] 6.1 Criar entidade, interface de repositório e BaseUseCase
     - Criar `src/modules/finance/accounts-receivable/src/domain/entity/account-receivable.entity.ts` com a classe AccountReceivable (id, pessoaId, numeroDocumento, descricao, categoriaFinanceiraId, centroCustoId, contaBancariaId, dataEmissao, dataVencimento, valor, valorRecebido, status, formaPagamento, createdAt, updatedAt)
     - Criar `src/modules/finance/accounts-receivable/src/domain/repository/account-receivable.interface.repository.ts` com IAccountReceivableRepository (create, findById, findAll, update, updateValorRecebido)
     - Substituir o base.use-case.ts existente mantendo a mesma interface
     - _Requisitos: 1.1, 1.2, 6.6_
 
-  - [~] 6.2 Criar DTOs de Contas a Receber
+  - [x] 6.2 Criar DTOs de Contas a Receber
     - Criar CreateAccountReceivableDTO com campos obrigatórios (pessoaId, numeroDocumento, descricao, categoriaFinanceiraId, dataEmissao, dataVencimento, valor) e opcionais (centroCustoId, contaBancariaId, formaPagamento)
     - Criar UpdateAccountReceivableDTO com todos os campos opcionais
     - Criar PaginationQueryDTO
     - _Requisitos: 11.1, 11.2, 11.3_
 
-  - [~] 6.3 Implementar repositório pg-promise de Contas a Receber
+  - [x] 6.3 Implementar repositório pg-promise de Contas a Receber
     - Criar `src/modules/finance/accounts-receivable/src/infra/repository/account-receivable.repository.ts`
     - Implementar create com status='PENDENTE' e valor_recebido=0 por padrão
     - Implementar findById, findAll com paginação, update com COALESCE
     - Implementar updateValorRecebido para atualizar valor_recebido e status atomicamente
     - _Requisitos: 12.1, 12.2, 12.3, 12.4, 12.5, 12.6_
 
-  - [~] 6.4 Implementar use-cases de Contas a Receber
+  - [x] 6.4 Implementar use-cases de Contas a Receber
     - Criar CreateAccountReceivableUseCase com validação de data_vencimento >= data_emissao e campos obrigatórios
     - Criar GetByIdAccountReceivableUseCase com tratamento de 404
     - Criar FindAllAccountReceivablesUseCase com paginação
     - Criar UpdateAccountReceivableUseCase com validação de existência e datas
     - _Requisitos: 6.1, 6.2, 6.3, 6.4, 6.5, 6.7, 6.8, 6.9_
 
-  - [~] 6.5 Implementar controller e módulo NestJS de Contas a Receber
+  - [x] 6.5 Implementar controller e módulo NestJS de Contas a Receber
     - Substituir o controller existente com implementação completa (POST, GET /:id, GET lista, PUT /:id)
     - Atualizar accounts-receivable.module.ts com providers corretos
     - Exportar use-cases para uso pelo módulo de Baixas Financeiras
@@ -229,32 +229,32 @@ Implementação completa do módulo de controle financeiro seguindo a arquitetur
     - _Requisitos: 6.5, 6.8, 6.9_
 
 
-- [ ] 7. Implementar submódulo Parcelas (installments)
-  - [~] 7.1 Criar entidade, interface de repositório e BaseUseCase
+- [x] 7. Implementar submódulo Parcelas (installments)
+  - [x] 7.1 Criar entidade, interface de repositório e BaseUseCase
     - Criar `src/modules/finance/installments/src/domain/entity/installment.entity.ts` com a classe Installment (id, origem, origemId, numeroParcela, totalParcelas, dataVencimento, valor, status, createdAt, updatedAt)
     - Criar `src/modules/finance/installments/src/domain/repository/installment.interface.repository.ts` com IInstallmentRepository (create, findById, findByOrigemId)
     - Criar `src/modules/finance/installments/src/domain/use-case/base.use-case.ts`
     - _Requisitos: 1.1, 1.2, 7.5_
 
-  - [~] 7.2 Criar DTOs de Parcelas
+  - [x] 7.2 Criar DTOs de Parcelas
     - Criar CreateInstallmentDTO com campos obrigatórios (origem, origemId, numeroParcela, totalParcelas, dataVencimento, valor)
     - _Requisitos: 11.1, 11.4_
 
-  - [~] 7.3 Implementar repositório pg-promise de Parcelas
+  - [x] 7.3 Implementar repositório pg-promise de Parcelas
     - Criar `src/modules/finance/installments/src/infra/repository/installment.repository.ts`
     - Implementar create com status='PENDENTE' por padrão
     - Implementar findById com db.oneOrNone()
     - Implementar findByOrigemId retornando parcelas ordenadas por numero_parcela ASC
     - _Requisitos: 12.1, 12.2, 12.4_
 
-  - [~] 7.4 Implementar use-cases de Parcelas
+  - [x] 7.4 Implementar use-cases de Parcelas
     - Criar CreateInstallmentUseCase com validação de origem_id existente (404) e numero_parcela <= total_parcelas (400)
     - Criar GetByIdInstallmentUseCase com tratamento de 404
     - Criar FindByOrigemIdInstallmentUseCase para listar parcelas de uma conta
     - Injetar IAccountPayableRepository e IAccountReceivableRepository para validar origem_id
     - _Requisitos: 7.1, 7.2, 7.3, 7.4, 7.6, 7.7_
 
-  - [~] 7.5 Implementar controller e módulo NestJS de Parcelas
+  - [x] 7.5 Implementar controller e módulo NestJS de Parcelas
     - Criar controller com rotas POST, GET /:id, GET ?origemId=:id
     - Criar installments.module.ts importando AccountsPayableModule e AccountsReceivableModule
     - _Requisitos: 13.1, 13.2, 13.3, 13.4, 13.5, 13.6_
@@ -269,36 +269,36 @@ Implementação completa do módulo de controle financeiro seguindo a arquitetur
     - Testar inicialização de status como PENDENTE
     - _Requisitos: 7.4, 7.6, 7.7_
 
-- [~] 8. Checkpoint - Verificar submódulos de contas e parcelas
+- [x] 8. Checkpoint - Verificar submódulos de contas e parcelas
   - Garantir que todos os testes passam para Contas a Pagar, Contas a Receber e Parcelas. Perguntar ao usuário se há dúvidas.
 
 
-- [ ] 9. Implementar submódulo Lançamentos Financeiros (financial-entries)
-  - [~] 9.1 Criar entidade, interface de repositório e BaseUseCase
+- [x] 9. Implementar submódulo Lançamentos Financeiros (financial-entries)
+  - [x] 9.1 Criar entidade, interface de repositório e BaseUseCase
     - Criar `src/modules/finance/financial-entries/src/domain/entity/financial-entry.entity.ts` com a classe FinancialEntry (id, tipo, origem, origemId, planoContaId, centroCustoId, contaBancariaId, caixaId, dataLancamento, descricao, valor, saldoAnterior, saldoPosterior)
     - Criar `src/modules/finance/financial-entries/src/domain/repository/financial-entry.interface.repository.ts` com IFinancialEntryRepository (create, findById, findAll)
     - Criar `src/modules/finance/financial-entries/src/domain/use-case/base.use-case.ts`
     - _Requisitos: 1.1, 1.2, 9.8_
 
-  - [~] 9.2 Criar DTOs de Lançamentos Financeiros
+  - [x] 9.2 Criar DTOs de Lançamentos Financeiros
     - Criar CreateFinancialEntryDTO com campos obrigatórios (tipo, origem, origemId, planoContaId, dataLancamento, descricao, valor) e opcionais (centroCustoId, contaBancariaId, caixaId)
     - Criar PaginationQueryDTO
     - _Requisitos: 11.1, 11.3_
 
-  - [~] 9.3 Implementar repositório pg-promise de Lançamentos Financeiros
+  - [x] 9.3 Implementar repositório pg-promise de Lançamentos Financeiros
     - Criar `src/modules/finance/financial-entries/src/infra/repository/financial-entry.repository.ts`
     - Implementar create com INSERT RETURNING, aceitar transaction opcional
     - Implementar findById com db.oneOrNone()
     - Implementar findAll com paginação LIMIT/OFFSET e COUNT
     - _Requisitos: 12.1, 12.2, 12.3, 12.4, 12.5_
 
-  - [~] 9.4 Implementar use-cases de Lançamentos Financeiros
+  - [x] 9.4 Implementar use-cases de Lançamentos Financeiros
     - Criar CreateFinancialEntryUseCase com validação de campos obrigatórios (400) e cálculo de saldo (saldoAnterior/saldoPosterior quando contaBancariaId ou caixaId informado)
     - Criar GetByIdFinancialEntryUseCase com tratamento de 404
     - Criar FindAllFinancialEntriesUseCase com paginação e valores padrão (page=1, limit=10)
     - _Requisitos: 9.1, 9.2, 9.3, 9.4, 9.5, 9.6, 9.7_
 
-  - [~] 9.5 Implementar controller e módulo NestJS de Lançamentos Financeiros
+  - [x] 9.5 Implementar controller e módulo NestJS de Lançamentos Financeiros
     - Criar controller com rotas POST, GET /:id, GET (lista paginada)
     - Criar financial-entries.module.ts exportando CreateFinancialEntryUseCase para uso pelo módulo de Baixas
     - _Requisitos: 13.1, 13.2, 13.3, 13.4, 13.5, 13.6_
@@ -314,25 +314,25 @@ Implementação completa do módulo de controle financeiro seguindo a arquitetur
     - _Requisitos: 9.2, 9.4, 9.7_
 
 
-- [ ] 10. Implementar submódulo Baixas Financeiras (financial-settlements)
-  - [~] 10.1 Criar entidade, interface de repositório e BaseUseCase
+- [x] 10. Implementar submódulo Baixas Financeiras (financial-settlements)
+  - [x] 10.1 Criar entidade, interface de repositório e BaseUseCase
     - Criar `src/modules/finance/financial-settlements/src/domain/entity/financial-settlement.entity.ts` com a classe FinancialSettlement (id, tipoConta, contaId, valor, dataPagamento, formaPagamento, contaBancariaId, caixaId, lancamentoFinanceiroId, observacao, createdAt, updatedAt)
     - Criar `src/modules/finance/financial-settlements/src/domain/repository/financial-settlement.interface.repository.ts` com IFinancialSettlementRepository (create, findById, findByContaId)
     - Criar `src/modules/finance/financial-settlements/src/domain/use-case/base.use-case.ts`
     - _Requisitos: 1.1, 1.2, 8.9_
 
-  - [~] 10.2 Criar DTOs de Baixas Financeiras
+  - [x] 10.2 Criar DTOs de Baixas Financeiras
     - Criar CreateFinancialSettlementDTO com campos obrigatórios (tipoConta, contaId, valor, dataPagamento, formaPagamento) e opcionais (contaBancariaId, caixaId, observacao)
     - _Requisitos: 11.1, 11.4_
 
-  - [~] 10.3 Implementar repositório pg-promise de Baixas Financeiras
+  - [x] 10.3 Implementar repositório pg-promise de Baixas Financeiras
     - Criar `src/modules/finance/financial-settlements/src/infra/repository/financial-settlement.repository.ts`
     - Implementar create com INSERT RETURNING, aceitar transaction
     - Implementar findById com db.oneOrNone()
     - Implementar findByContaId retornando todas as baixas de uma conta
     - _Requisitos: 12.1, 12.2, 12.3, 12.4_
 
-  - [~] 10.4 Implementar use-cases de Baixas Financeiras
+  - [x] 10.4 Implementar use-cases de Baixas Financeiras
     - Criar CreateFinancialSettlementUseCase com lógica transacional (connection().tx):
       1. Buscar conta (pagar ou receber) e validar existência (404)
       2. Validar que valor da baixa não excede saldo restante (400)
@@ -344,7 +344,7 @@ Implementação completa do módulo de controle financeiro seguindo a arquitetur
     - Injetar IAccountPayableRepository, IAccountReceivableRepository e CreateFinancialEntryUseCase
     - _Requisitos: 8.1, 8.2, 8.3, 8.4, 8.5, 8.6, 8.7, 8.8, 1.5_
 
-  - [~] 10.5 Implementar controller e módulo NestJS de Baixas Financeiras
+  - [x] 10.5 Implementar controller e módulo NestJS de Baixas Financeiras
     - Criar controller com rotas POST, GET /:id, GET ?contaId=:id
     - Criar financial-settlements.module.ts importando AccountsPayableModule, AccountsReceivableModule e FinancialEntriesModule
     - _Requisitos: 13.1, 13.2, 13.3, 13.4, 13.5, 13.6_
@@ -364,33 +364,33 @@ Implementação completa do módulo de controle financeiro seguindo a arquitetur
     - _Requisitos: 8.2, 8.3, 8.5, 8.6_
 
 
-- [ ] 11. Implementar submódulo Formas de Pagamento (payment-methods)
-  - [-] 11.1 Criar entidade, interface de repositório e BaseUseCase
+- [x] 11. Implementar submódulo Formas de Pagamento (payment-methods)
+  - [x] 11.1 Criar entidade, interface de repositório e BaseUseCase
     - Criar `src/modules/finance/payment-methods/src/domain/entity/payment-method.entity.ts` com a classe PaymentMethod (id, nome, descricao, ativo)
     - Criar `src/modules/finance/payment-methods/src/domain/repository/payment-method.interface.repository.ts` com IPaymentMethodRepository (create, findById, findAll, update)
     - Criar `src/modules/finance/payment-methods/src/domain/use-case/base.use-case.ts`
     - _Requisitos: 1.1, 1.2, 10.7_
 
-  - [~] 11.2 Criar DTOs de Formas de Pagamento
+  - [x] 11.2 Criar DTOs de Formas de Pagamento
     - Criar CreatePaymentMethodDTO com campo obrigatório (nome) e opcional (descricao)
     - Criar UpdatePaymentMethodDTO com todos os campos opcionais (nome, descricao, ativo)
     - Criar PaginationQueryDTO
     - _Requisitos: 11.1, 11.2, 11.3_
 
-  - [~] 11.3 Implementar repositório pg-promise de Formas de Pagamento
+  - [x] 11.3 Implementar repositório pg-promise de Formas de Pagamento
     - Criar `src/modules/finance/payment-methods/src/infra/repository/payment-method.repository.ts`
     - Implementar create com ativo=true por padrão
     - Implementar findById, findAll com paginação, update com COALESCE
     - _Requisitos: 12.1, 12.2, 12.4, 12.5, 12.6_
 
-  - [~] 11.4 Implementar use-cases de Formas de Pagamento
+  - [x] 11.4 Implementar use-cases de Formas de Pagamento
     - Criar CreatePaymentMethodUseCase com validação de nome obrigatório (400)
     - Criar GetByIdPaymentMethodUseCase com tratamento de 404
     - Criar FindAllPaymentMethodsUseCase com paginação
     - Criar UpdatePaymentMethodUseCase com validação de existência (404)
     - _Requisitos: 10.1, 10.2, 10.3, 10.4, 10.5, 10.6_
 
-  - [~] 11.5 Implementar controller e módulo NestJS de Formas de Pagamento
+  - [x] 11.5 Implementar controller e módulo NestJS de Formas de Pagamento
     - Criar controller com rotas POST, GET /:id, GET (lista), PUT /:id
     - Criar payment-methods.module.ts registrando providers
     - _Requisitos: 13.1, 13.2, 13.3, 13.4, 13.5_
@@ -400,12 +400,12 @@ Implementação completa do módulo de controle financeiro seguindo a arquitetur
     - Testar paginação com valores padrão
     - _Requisitos: 10.5, 10.6_
 
-- [~] 12. Checkpoint - Verificar submódulos avançados
+- [x] 12. Checkpoint - Verificar submódulos avançados
   - Garantir que todos os testes passam para Lançamentos Financeiros, Baixas Financeiras e Formas de Pagamento. Perguntar ao usuário se há dúvidas.
 
 
-- [ ] 13. Integração e registro no AppModule
-  - [~] 13.1 Registrar todos os submódulos financeiros no AppModule
+- [x] 13. Integração e registro no AppModule
+  - [x] 13.1 Registrar todos os submódulos financeiros no AppModule
     - Importar ChartOfAccountsModule, CostCentersModule, FinancialCategoriesModule, AccountsPayableModule, AccountsReceivableModule, InstallmentsModule, FinancialEntriesModule, FinancialSettlementsModule e PaymentMethodsModule no app.module.ts
     - Garantir que o DatabaseModule está importado e disponível
     - _Requisitos: 13.1, 13.5_
@@ -415,7 +415,7 @@ Implementação completa do módulo de controle financeiro seguindo a arquitetur
     - Testar atomicidade: simular falha no meio da transação e verificar rollback
     - _Requisitos: 8.2, 8.3, 8.4, 1.5_
 
-- [~] 14. Checkpoint final - Validação completa
+- [x] 14. Checkpoint final - Validação completa
   - Garantir que todos os testes passam, verificar que todos os endpoints estão acessíveis. Perguntar ao usuário se há dúvidas.
 
 ## Notes

@@ -1,31 +1,38 @@
-import { Body, Controller, Get, Post, Put } from '@nestjs/common';
-import { CreateAccountsPayableUseCase } from '../../application/use-cases/create-accounts-payable.use-case';
-import { GetByIdAccountsPayableUseCase } from '../../application/use-cases/get-by-id-accounts-payable.use-case';
+import { Body, Controller, Get, Param, Post, Put, Query } from '@nestjs/common';
+import { CreateAccountPayableUseCase } from '../../application/use-cases/create-account-payable.use-case';
+import { GetByIdAccountPayableUseCase } from '../../application/use-cases/get-by-id-account-payable.use-case';
+import { FindAllAccountPayablesUseCase } from '../../application/use-cases/find-all-account-payables.use-case';
+import { UpdateAccountPayableUseCase } from '../../application/use-cases/update-account-payable.use-case';
+import { CreateAccountPayableDTO } from '../../application/dto/create-account-payable.dto';
+import { UpdateAccountPayableDTO } from '../../application/dto/update-account-payable.dto';
+import { PaginationQueryDTO } from '../../application/dto/pagination-query.dto';
 
 @Controller('accounts-payable')
 export class AccountsPayableController {
   constructor(
-    private readonly createAccountsPayableUseCase: CreateAccountsPayableUseCase,
-    private readonly getByIdAccountsPayableUseCase: GetByIdAccountsPayableUseCase,
+    private readonly createAccountPayableUseCase: CreateAccountPayableUseCase,
+    private readonly getByIdAccountPayableUseCase: GetByIdAccountPayableUseCase,
+    private readonly findAllAccountPayablesUseCase: FindAllAccountPayablesUseCase,
+    private readonly updateAccountPayableUseCase: UpdateAccountPayableUseCase,
   ) {}
 
   @Get(':id')
-  getAccountsPayableById() {
-    return this.getByIdAccountsPayableUseCase.execute({ id: 'some-id' });
+  getAccountPayableById(@Param('id') id: string) {
+    return this.getByIdAccountPayableUseCase.execute({ id });
   }
 
   @Get()
-  findAll() {
-    return 'All AccountsPayables';
+  findAll(@Query() query: PaginationQueryDTO) {
+    return this.findAllAccountPayablesUseCase.execute(query);
   }
 
   @Post()
-  create(@Body() createAccountsPayableDto: any) {
-    return this.createAccountsPayableUseCase.execute(createAccountsPayableDto);
+  create(@Body() createAccountPayableDto: CreateAccountPayableDTO) {
+    return this.createAccountPayableUseCase.execute(createAccountPayableDto);
   }
 
-  @Put()
-  updateAccountsPayable(@Body() createAccountsPayableDto: any) {
-    return createAccountsPayableDto;
+  @Put(':id')
+  update(@Param('id') id: string, @Body() updateAccountPayableDto: UpdateAccountPayableDTO) {
+    return this.updateAccountPayableUseCase.execute({ id, data: updateAccountPayableDto });
   }
 }
