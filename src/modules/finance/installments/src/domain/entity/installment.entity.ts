@@ -6,7 +6,8 @@ export class Installment {
   totalParcelas: number;
   dataVencimento: Date;
   valor: number;
-  status: string;
+  valorPago: number;
+  status: 'PENDENTE' | 'PARCIAL' | 'PAGO' | 'CANCELADO';
   createdAt: Date;
   updatedAt?: Date;
 }

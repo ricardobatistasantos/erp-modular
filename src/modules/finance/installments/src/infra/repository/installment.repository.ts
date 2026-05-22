@@ -12,8 +12,8 @@ export class InstallmentRepository implements IInstallmentRepository {
   async create(data: CreateInstallmentDTO, transaction?: any): Promise<Installment> {
     const db = transaction || this.connection();
     return db.one(
-      `INSERT INTO parcelas (id, origem, origem_id, numero_parcela, total_parcelas, data_vencimento, valor, status)
-       VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, 'PENDENTE') RETURNING *`,
+      `INSERT INTO parcelas (id, origem, origem_id, numero_parcela, total_parcelas, data_vencimento, valor, valor_pago, status)
+       VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, 0, 'PENDENTE') RETURNING *`,
       [
         data.origem,
         data.origemId,
@@ -25,12 +25,39 @@ export class InstallmentRepository implements IInstallmentRepository {
     );
   }
 
+  async createMany(data: CreateInstallmentDTO[], transaction?: any): Promise<Installment[]> {
+    const db = transaction || this.connection();
+
+    if (data.length === 0) {
+      return [];
+    }
+
+    const values = data
+      .map(
+        (_, i) =>
+          `(gen_random_uuid(), $${i * 6 + 1}, $${i * 6 + 2}, $${i * 6 + 3}, $${i * 6 + 4}, $${i * 6 + 5}, $${i * 6 + 6}, 0, 'PENDENTE')`,
+      )
+      .join(', ');
+
+    const params = data.flatMap((d) => [
+      d.origem,
+      d.origemId,
+      d.numeroParcela,
+      d.totalParcelas,
+      d.dataVencimento,
+      d.valor,
+    ]);
+
+    return db.any(
+      `INSERT INTO parcelas (id, origem, origem_id, numero_parcela, total_parcelas, data_vencimento, valor, valor_pago, status)
+       VALUES ${values} RETURNING *`,
+      params,
+    );
+  }
+
   async findById(id: string): Promise<Installment | null> {
     const db = this.connection();
-    return db.oneOrNone(
-      `SELECT * FROM parcelas WHERE id = $1`,
-      [id],
-    );
+    return db.oneOrNone(`SELECT * FROM parcelas WHERE id = $1`, [id]);
   }
 
   async findByOrigemId(origemId: string): Promise<Installment[]> {
@@ -39,5 +66,42 @@ export class InstallmentRepository implements IInstallmentRepository {
       `SELECT * FROM parcelas WHERE origem_id = $1 ORDER BY numero_parcela ASC`,
       [origemId],
     );
+  }
+
+  async updateValorPago(
+    id: string,
+    valorPago: number,
+    status: string,
+    transaction?: any,
+  ): Promise<Installment> {
+    const db = transaction || this.connection();
+    return db.one(
+      `UPDATE parcelas SET valor_pago = $1, status = $2, updated_at = NOW() WHERE id = $3 RETURNING *`,
+      [valorPago, status, id],
+    );
+  }
+
+  async updateStatus(
+    id: string,
+    status: string,
+    transaction?: any,
+  ): Promise<Installment> {
+    const db = transaction || this.connection();
+    return db.one(
+      `UPDATE parcelas SET status = $1, updated_at = NOW() WHERE id = $2 RETURNING *`,
+      [status, id],
+    );
+  }
+
+  async hasSettlements(origemId: string): Promise<boolean> {
+    const db = this.connection();
+    const result = await db.oneOrNone(
+      `SELECT 1 FROM parcelas p
+       INNER JOIN baixas_financeiras bf ON bf.parcela_id = p.id
+       WHERE p.origem_id = $1
+       LIMIT 1`,
+      [origemId],
+    );
+    return result !== null;
   }
 }

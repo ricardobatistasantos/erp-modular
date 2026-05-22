@@ -1,8 +1,12 @@
 export class FinancialSettlement {
   id: string;
   tipoConta: 'RECEBER' | 'PAGAR';
-  contaId: string;
+  parcelaId: string;
   valor: number;
+  juros: number;
+  multa: number;
+  desconto: number;
+  valorLiquido: number;
   dataPagamento: Date;
   formaPagamento: string;
   contaBancariaId?: string;

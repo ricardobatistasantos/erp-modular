@@ -1,15 +1,15 @@
 import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
-import { CreateFinancialSettlementUseCase } from '../../application/use-cases/create-financial-settlement.use-case';
 import { GetByIdFinancialSettlementUseCase } from '../../application/use-cases/get-by-id-financial-settlement.use-case';
-import { FindByContaIdFinancialSettlementUseCase } from '../../application/use-cases/find-by-conta-id-financial-settlement.use-case';
-import { CreateFinancialSettlementDTO } from '../../application/dto/create-financial-settlement.dto';
+import { FindByParcelaIdFinancialSettlementUseCase } from '../../application/use-cases/find-by-parcela-id-financial-settlement.use-case';
+import { SettleInstallmentUseCase } from '../../application/use-cases/settle-installment.use-case';
+import { SettleInstallmentDTO } from '../../application/dto/settle-installment.dto';
 
 @Controller('financial-settlements')
 export class FinancialSettlementController {
   constructor(
-    private readonly createFinancialSettlementUseCase: CreateFinancialSettlementUseCase,
+    private readonly settleInstallmentUseCase: SettleInstallmentUseCase,
     private readonly getByIdFinancialSettlementUseCase: GetByIdFinancialSettlementUseCase,
-    private readonly findByContaIdFinancialSettlementUseCase: FindByContaIdFinancialSettlementUseCase,
+    private readonly findByParcelaIdFinancialSettlementUseCase: FindByParcelaIdFinancialSettlementUseCase,
   ) {}
 
   @Get(':id')
@@ -18,12 +18,12 @@ export class FinancialSettlementController {
   }
 
   @Get()
-  findByContaId(@Query('contaId') contaId: string) {
-    return this.findByContaIdFinancialSettlementUseCase.execute({ contaId });
+  findByParcelaId(@Query('parcelaId') parcelaId: string) {
+    return this.findByParcelaIdFinancialSettlementUseCase.execute({ parcelaId });
   }
 
   @Post()
-  create(@Body() createFinancialSettlementDto: CreateFinancialSettlementDTO) {
-    return this.createFinancialSettlementUseCase.execute(createFinancialSettlementDto);
+  create(@Body() settleInstallmentDto: SettleInstallmentDTO) {
+    return this.settleInstallmentUseCase.execute(settleInstallmentDto);
   }
 }
