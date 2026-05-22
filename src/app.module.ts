@@ -17,6 +17,7 @@ import { FinancialSettlementsModule } from './modules/finance/financial-settleme
 import { PaymentMethodsModule } from './modules/finance/payment-methods/src/payment-methods.module';
 import { BankAccountsModule } from './modules/finance/bank-accounts/src/bank-accounts.module';
 import { BanksModule } from './modules/finance/banks/src/banks.module';
+import { BankAgenciesModule } from './modules/finance/bank-agencies/src/bank-agencies.module';
 import { CashFlowModule } from './modules/finance/cash-flow/src/cash-flow.module';
 import { TreasuryModule } from './modules/finance/treasury/src/treasury.module';
 import { InventoryControlModule } from './modules/inventory-control/src/inventory-control.module';
@@ -42,6 +43,7 @@ import { DatabaseModule } from './infra/databases/pg-promise/config.module';
     FinancialSettlementsModule,
     PaymentMethodsModule,
     BankAccountsModule,
+    BankAgenciesModule,
     BanksModule,
     CashFlowModule,
     TreasuryModule,
