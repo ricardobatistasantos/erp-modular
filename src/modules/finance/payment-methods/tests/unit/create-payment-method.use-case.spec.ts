@@ -29,32 +29,7 @@ describe('CreatePaymentMethodUseCase', () => {
     expect(repository.create).toHaveBeenCalledWith(input);
   });
 
-  it('should throw 400 when nome is missing', async () => {
-    const input = { nome: '', descricao: 'Sem nome' };
 
-    await expect(useCase.execute(input)).rejects.toThrow(
-      new HttpException('O campo nome é obrigatório', HttpStatus.BAD_REQUEST),
-    );
-    expect(repository.create).not.toHaveBeenCalled();
-  });
-
-  it('should throw 400 when nome is only whitespace', async () => {
-    const input = { nome: '   ', descricao: 'Apenas espaços' };
-
-    await expect(useCase.execute(input)).rejects.toThrow(
-      new HttpException('O campo nome é obrigatório', HttpStatus.BAD_REQUEST),
-    );
-    expect(repository.create).not.toHaveBeenCalled();
-  });
-
-  it('should throw 400 when nome is null/undefined', async () => {
-    const input = { nome: undefined as any };
-
-    await expect(useCase.execute(input)).rejects.toThrow(
-      new HttpException('O campo nome é obrigatório', HttpStatus.BAD_REQUEST),
-    );
-    expect(repository.create).not.toHaveBeenCalled();
-  });
 
   it('should create a payment method without descricao', async () => {
     const input = { nome: 'PIX' };

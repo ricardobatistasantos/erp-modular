@@ -104,4 +104,58 @@ export class InstallmentRepository implements IInstallmentRepository {
     );
     return result !== null;
   }
+
+  async updateValor(
+    id: string,
+    valor: number,
+    transaction?: any,
+  ): Promise<Installment> {
+    const db = transaction || this.connection();
+    return db.one(
+      `UPDATE parcelas SET valor = $2, updated_at = NOW() WHERE id = $1 RETURNING *`,
+      [id, valor],
+    );
+  }
+
+  async cancelMany(ids: string[], transaction?: any): Promise<void> {
+    if (ids.length === 0) {
+      return;
+    }
+    const db = transaction || this.connection();
+    const placeholders = ids.map((_, i) => `$${i + 1}`).join(', ');
+    await db.none(
+      `UPDATE parcelas SET status = 'CANCELADO', updated_at = NOW() WHERE id IN (${placeholders})`,
+      ids,
+    );
+  }
+
+  async findPendingByOrigemId(origemId: string): Promise<Installment[]> {
+    const db = this.connection();
+    return db.any(
+      `SELECT * FROM parcelas WHERE origem_id = $1 AND status = 'PENDENTE' ORDER BY numero_parcela ASC`,
+      [origemId],
+    );
+  }
+
+  async getMaxNumeroParcela(origemId: string): Promise<number> {
+    const db = this.connection();
+    const result = await db.one(
+      `SELECT COALESCE(MAX(numero_parcela), 0) AS max_numero FROM parcelas WHERE origem_id = $1`,
+      [origemId],
+    );
+    return Number(result.max_numero);
+  }
+
+  async hasSettlementsByParcelaIds(parcelaIds: string[]): Promise<boolean> {
+    if (parcelaIds.length === 0) {
+      return false;
+    }
+    const db = this.connection();
+    const placeholders = parcelaIds.map((_, i) => `$${i + 1}`).join(', ');
+    const result = await db.oneOrNone(
+      `SELECT 1 FROM baixas_financeiras WHERE parcela_id IN (${placeholders}) LIMIT 1`,
+      parcelaIds,
+    );
+    return result !== null;
+  }
 }

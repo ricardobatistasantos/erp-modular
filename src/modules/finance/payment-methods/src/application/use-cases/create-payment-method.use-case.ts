@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Inject } from '@nestjs/common';
+import { Inject } from '@nestjs/common';
 
 import { BaseUseCase } from '../../domain/use-case/base.use-case';
 import { CreatePaymentMethodDTO } from '../dto/create-payment-method.dto';
@@ -12,13 +12,6 @@ export class CreatePaymentMethodUseCase implements BaseUseCase<CreatePaymentMeth
   ) {}
 
   async execute(data: CreatePaymentMethodDTO): Promise<PaymentMethod> {
-    if (!data.nome || data.nome.trim() === '') {
-      throw new HttpException(
-        'O campo nome é obrigatório',
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-
     return this.repository.create(data);
   }
 }

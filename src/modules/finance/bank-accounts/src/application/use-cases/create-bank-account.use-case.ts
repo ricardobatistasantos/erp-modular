@@ -15,42 +15,6 @@ export class CreateBankAccountUseCase implements BaseUseCase<CreateBankAccountDT
   ) {}
 
   async execute(data: CreateBankAccountDTO): Promise<BankAccount> {
-    const missingFields: string[] = [];
-
-    if (!data.bancoAgenciaId || data.bancoAgenciaId.trim() === '') {
-      missingFields.push('bancoAgenciaId');
-    }
-
-    if (!data.numero || data.numero.trim() === '') {
-      missingFields.push('numero');
-    }
-
-    if (!data.digito || data.digito.trim() === '') {
-      missingFields.push('digito');
-    }
-
-    if (!data.nome || data.nome.trim() === '') {
-      missingFields.push('nome');
-    }
-
-    if (!data.tipo || data.tipo.trim() === '') {
-      missingFields.push('tipo');
-    }
-
-    if (missingFields.length > 0) {
-      throw new HttpException(
-        `Campos obrigatórios não informados: ${missingFields.join(', ')}`,
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-
-    if (!['I', 'P', 'C'].includes(data.tipo)) {
-      throw new HttpException(
-        'O campo tipo deve ser I (Investimento), P (Poupança) ou C (Corrente)',
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-
     const agency = await this.bankAgencyRepository.findById(data.bancoAgenciaId);
 
     if (!agency) {

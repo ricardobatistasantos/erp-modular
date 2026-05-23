@@ -69,35 +69,7 @@ describe('GenerateInstallmentsUseCase', () => {
       );
     });
 
-    it('should throw 400 when quantidadeParcelas is less than 1', async () => {
-      await expect(
-        useCase.execute({
-          tipoConta: 'PAGAR',
-          contaId: 'conta-1',
-          quantidadeParcelas: 0,
-        }),
-      ).rejects.toThrow(
-        new HttpException(
-          'Quantidade de parcelas deve ser maior que zero',
-          HttpStatus.BAD_REQUEST,
-        ),
-      );
-    });
 
-    it('should throw 400 when quantidadeParcelas is negative', async () => {
-      await expect(
-        useCase.execute({
-          tipoConta: 'PAGAR',
-          contaId: 'conta-1',
-          quantidadeParcelas: -1,
-        }),
-      ).rejects.toThrow(
-        new HttpException(
-          'Quantidade de parcelas deve ser maior que zero',
-          HttpStatus.BAD_REQUEST,
-        ),
-      );
-    });
 
     it('should throw 400 when re-generating installments with existing settlements', async () => {
       accountPayableRepository.findById.mockResolvedValue({

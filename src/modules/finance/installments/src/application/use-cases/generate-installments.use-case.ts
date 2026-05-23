@@ -22,15 +22,7 @@ export class GenerateInstallmentsUseCase
   ) {}
 
   async execute(data: GenerateInstallmentsDTO): Promise<Installment[]> {
-    // 1. Validate quantity
-    if (!data.quantidadeParcelas || data.quantidadeParcelas < 1) {
-      throw new HttpException(
-        'Quantidade de parcelas deve ser maior que zero',
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-
-    // 2. Validate account exists
+    // 1. Validate account exists
     let account: any;
     if (data.tipoConta === 'PAGAR') {
       account = await this.accountPayableRepository.findById(data.contaId);

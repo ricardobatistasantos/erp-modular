@@ -17,4 +17,9 @@ export interface IInstallmentRepository {
     transaction?: any,
   ): Promise<Installment>;
   hasSettlements(origemId: string): Promise<boolean>;
+  updateValor(id: string, valor: number, transaction?: any): Promise<Installment>;
+  cancelMany(ids: string[], transaction?: any): Promise<void>;
+  findPendingByOrigemId(origemId: string): Promise<Installment[]>;
+  getMaxNumeroParcela(origemId: string): Promise<number>;
+  hasSettlementsByParcelaIds(parcelaIds: string[]): Promise<boolean>;
 }

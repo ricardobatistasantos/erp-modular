@@ -4,28 +4,24 @@ import { BaseUseCase } from '../../domain/use-case/base.use-case';
 import { CreateAccountPayableDTO } from '../dto/create-account-payable.dto';
 import { AccountPayable } from '../../domain/entity/account-payable.entity';
 import { IAccountPayableRepository } from '../../domain/repository/account-payable.interface.repository';
+import { IInstallmentRepository } from '../../../../installments/src/domain/repository/installment.interface.repository';
+import { InstallmentCalculator } from '../../../../installments/src/domain/services/installment-calculator';
+import { InstallmentValidation } from '../../../../installments/src/domain/validation/installment-validation';
+import { CreateInstallmentDTO } from '../../../../installments/src/application/dto/create-installment.dto';
 
 export class CreateAccountPayableUseCase implements BaseUseCase<CreateAccountPayableDTO, AccountPayable> {
   constructor(
     @Inject('IAccountPayableRepository')
     private readonly repository: IAccountPayableRepository,
+    @Inject('IInstallmentRepository')
+    private readonly installmentRepository: IInstallmentRepository,
+    @Inject('DATABASE_CONNECTION')
+    private readonly connection: any,
+    private readonly installmentCalculator: InstallmentCalculator,
+    private readonly installmentValidation: InstallmentValidation,
   ) {}
 
   async execute(data: CreateAccountPayableDTO): Promise<AccountPayable> {
-    if (!data.pessoaId || !data.numeroDocumento || !data.descricao || !data.categoriaFinanceiraId || !data.dataEmissao || !data.dataVencimento || !data.valor) {
-      throw new HttpException(
-        'Campos obrigatórios não informados: pessoaId, numeroDocumento, descricao, categoriaFinanceiraId, dataEmissao, dataVencimento e valor são obrigatórios',
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-
-    if (data.valor <= 0) {
-      throw new HttpException(
-        'O campo valor deve ser maior que zero',
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-
     const dataEmissao = new Date(data.dataEmissao);
     const dataVencimento = new Date(data.dataVencimento);
 
@@ -36,6 +32,64 @@ export class CreateAccountPayableUseCase implements BaseUseCase<CreateAccountPay
       );
     }
 
-    return this.repository.create(data);
+    if (data.parcelamento) {
+      this.installmentValidation.validateCreation(
+        data.parcelamento,
+        data.valor,
+        dataEmissao,
+      );
+    }
+
+    return this.connection().tx(async (transaction) => {
+      const account = await this.repository.create(data, transaction);
+
+      if (data.parcelamento) {
+        const calculatedInstallments = this.installmentCalculator.calculate({
+          valorTotal: data.valor,
+          quantidadeParcelas: data.parcelamento.quantidadeParcelas,
+          dataVencimentoBase: dataVencimento,
+          intervaloMeses: data.parcelamento.intervaloMeses,
+          valores: data.parcelamento.valores,
+          datasVencimento: data.parcelamento.datasVencimento,
+        });
+
+        const installmentDtos: CreateInstallmentDTO[] = calculatedInstallments.map(
+          (parcela) => ({
+            origem: 'PAGAR' as const,
+            origemId: account.id,
+            numeroParcela: parcela.numeroParcela,
+            totalParcelas: data.parcelamento.quantidadeParcelas,
+            dataVencimento: parcela.dataVencimento,
+            valor: parcela.valor,
+          }),
+        );
+
+        const createdInstallments = await this.installmentRepository.createMany(
+          installmentDtos,
+          transaction,
+        );
+
+        this.installmentValidation.validateIntegrity(
+          createdInstallments.map((i) => ({ valor: i.valor, status: i.status })),
+          data.valor,
+        );
+      } else {
+        const singleInstallment: CreateInstallmentDTO = {
+          origem: 'PAGAR',
+          origemId: account.id,
+          numeroParcela: 1,
+          totalParcelas: 1,
+          dataVencimento: dataVencimento,
+          valor: data.valor,
+        };
+
+        await this.installmentRepository.createMany(
+          [singleInstallment],
+          transaction,
+        );
+      }
+
+      return account;
+    });
   }
 }
