@@ -6,6 +6,8 @@ import { EmployeeModule } from './modules/person/employee/src/employee.module';
 import { ProductModule } from './modules/product/product/src/product.module';
 import { CategoryModule } from './modules/product/category/src/category.module';
 import { SubCategoryModule } from './modules/product/sub-category/src/sub-category.module';
+import { BrandModule } from './modules/product/brand/src/brand.module';
+import { UnitOfMeasureModule } from './modules/product/unit-of-measure/src/unit-of-measure.module';
 import { ChartOfAccountsModule } from './modules/finance/chart-of-accounts/src/chart-of-accounts.module';
 import { CostCentersModule } from './modules/finance/cost-centers/src/cost-centers.module';
 import { FinancialCategoriesModule } from './modules/finance/financial-categories/src/financial-categories.module';
@@ -56,6 +58,8 @@ import { DatabaseModule } from './infra/databases/pg-promise/config.module';
     ProductModule,
     CategoryModule,
     SubCategoryModule,
+    BrandModule,
+    UnitOfMeasureModule,
     SalesModule,
     TaxManagementModule,
   ],
