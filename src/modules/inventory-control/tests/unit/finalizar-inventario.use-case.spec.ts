@@ -13,6 +13,9 @@ describe('FinalizarInventarioUseCase', () => {
   let useCase: FinalizarInventarioUseCase;
   let inventarioRepository: jest.Mocked<IInventarioRepository>;
   let createMovimentoEstoqueUseCase: jest.Mocked<CreateMovimentoEstoqueUseCase>;
+  let mockTransaction: any;
+  let mockTx: jest.Mock;
+  let mockConnection: jest.Mock;
 
   beforeEach(() => {
     inventarioRepository = {
@@ -29,9 +32,14 @@ describe('FinalizarInventarioUseCase', () => {
       execute: jest.fn(),
     } as any;
 
+    mockTransaction = { id: 'mock-tx' };
+    mockTx = jest.fn((callback) => callback(mockTransaction));
+    mockConnection = jest.fn(() => ({ tx: mockTx }));
+
     useCase = new FinalizarInventarioUseCase(
       inventarioRepository,
       createMovimentoEstoqueUseCase,
+      mockConnection,
     );
   });
 
@@ -69,6 +77,9 @@ describe('FinalizarInventarioUseCase', () => {
       await expect(useCase.execute(dto)).rejects.toMatchObject({
         status: HttpStatus.NOT_FOUND,
       });
+
+      // Não deve abrir transação
+      expect(mockTx).not.toHaveBeenCalled();
     });
 
     it('deve lançar erro se o inventário não estiver com status ABERTO', async () => {
@@ -80,6 +91,9 @@ describe('FinalizarInventarioUseCase', () => {
       await expect(useCase.execute(dto)).rejects.toMatchObject({
         status: HttpStatus.BAD_REQUEST,
       });
+
+      // Não deve abrir transação
+      expect(mockTx).not.toHaveBeenCalled();
     });
 
     it('deve buscar o inventário pelo ID informado no DTO', async () => {
@@ -131,6 +145,7 @@ describe('FinalizarInventarioUseCase', () => {
           quantidade: 10,
           custoUnitario: 0,
         }),
+        mockTransaction,
       );
     });
 
@@ -158,6 +173,7 @@ describe('FinalizarInventarioUseCase', () => {
           quantidade: 20,
           custoUnitario: 0,
         }),
+        mockTransaction,
       );
     });
 
@@ -216,7 +232,7 @@ describe('FinalizarInventarioUseCase', () => {
   });
 
   describe('Finalização do inventário', () => {
-    it('deve chamar inventarioRepository.finalize com o ID do inventário', async () => {
+    it('deve chamar inventarioRepository.finalize com o ID do inventário e a transação', async () => {
       const dto = makeDto();
       const inventario = makeInventario();
 
@@ -228,7 +244,7 @@ describe('FinalizarInventarioUseCase', () => {
 
       await useCase.execute(dto);
 
-      expect(inventarioRepository.finalize).toHaveBeenCalledWith('inventario-001');
+      expect(inventarioRepository.finalize).toHaveBeenCalledWith('inventario-001', mockTransaction);
     });
 
     it('deve retornar o inventário finalizado', async () => {

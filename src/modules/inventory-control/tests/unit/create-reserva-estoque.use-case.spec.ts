@@ -13,6 +13,9 @@ describe('CreateReservaEstoqueUseCase', () => {
   let useCase: CreateReservaEstoqueUseCase;
   let reservaRepository: jest.Mocked<IReservaEstoqueRepository>;
   let saldoRepository: jest.Mocked<ISaldoEstoqueRepository>;
+  let mockConnection: jest.Mock;
+  let mockTx: jest.Mock;
+  let mockTransaction: object;
 
   beforeEach(() => {
     reservaRepository = {
@@ -28,9 +31,14 @@ describe('CreateReservaEstoqueUseCase', () => {
       findByProdutoAndDeposito: jest.fn(),
     };
 
+    mockTransaction = {};
+    mockTx = jest.fn((callback) => callback(mockTransaction));
+    mockConnection = jest.fn(() => ({ tx: mockTx }));
+
     useCase = new CreateReservaEstoqueUseCase(
       reservaRepository,
       saldoRepository,
+      mockConnection,
     );
   });
 
@@ -77,7 +85,7 @@ describe('CreateReservaEstoqueUseCase', () => {
       expect(result.createdAt).toBeInstanceOf(Date);
     });
 
-    it('deve chamar reservaRepository.create com a reserva', async () => {
+    it('deve chamar reservaRepository.create com a reserva e a transação', async () => {
       const dto = makeDto();
       const saldo = makeSaldo();
 
@@ -97,6 +105,7 @@ describe('CreateReservaEstoqueUseCase', () => {
           quantidade: 5,
           status: StatusReservaEstoque.RESERVADO,
         }),
+        mockTransaction,
       );
     });
   });
@@ -174,6 +183,7 @@ describe('CreateReservaEstoqueUseCase', () => {
         expect.objectContaining({
           reservado: 15,
         }),
+        mockTransaction,
       );
     });
 
@@ -207,6 +217,7 @@ describe('CreateReservaEstoqueUseCase', () => {
           saldoQuantidade: 100,
           reservado: 5,
         }),
+        mockTransaction,
       );
     });
 
@@ -221,6 +232,71 @@ describe('CreateReservaEstoqueUseCase', () => {
       await useCase.execute(dto);
 
       expect(saldoRepository.upsert).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('Orquestração transacional', () => {
+    it('deve executar todas as operações dentro de connection().tx()', async () => {
+      const dto = makeDto();
+      const saldo = makeSaldo();
+
+      saldoRepository.findByProdutoAndDeposito.mockResolvedValue(saldo);
+      reservaRepository.create.mockImplementation(async (r) => r);
+      saldoRepository.upsert.mockImplementation(async (s) => s);
+
+      await useCase.execute(dto);
+
+      expect(mockConnection).toHaveBeenCalledTimes(1);
+      expect(mockTx).toHaveBeenCalledTimes(1);
+    });
+
+    it('deve passar a transação para saldoRepository.findByProdutoAndDeposito', async () => {
+      const dto = makeDto();
+      const saldo = makeSaldo();
+
+      saldoRepository.findByProdutoAndDeposito.mockResolvedValue(saldo);
+      reservaRepository.create.mockImplementation(async (r) => r);
+      saldoRepository.upsert.mockImplementation(async (s) => s);
+
+      await useCase.execute(dto);
+
+      expect(saldoRepository.findByProdutoAndDeposito).toHaveBeenCalledWith(
+        dto.produtoId,
+        dto.depositoId,
+        mockTransaction,
+      );
+    });
+
+    it('deve passar a transação para reservaRepository.create', async () => {
+      const dto = makeDto();
+      const saldo = makeSaldo();
+
+      saldoRepository.findByProdutoAndDeposito.mockResolvedValue(saldo);
+      reservaRepository.create.mockImplementation(async (r) => r);
+      saldoRepository.upsert.mockImplementation(async (s) => s);
+
+      await useCase.execute(dto);
+
+      expect(reservaRepository.create).toHaveBeenCalledWith(
+        expect.any(ReservaEstoque),
+        mockTransaction,
+      );
+    });
+
+    it('deve passar a transação para saldoRepository.upsert', async () => {
+      const dto = makeDto();
+      const saldo = makeSaldo();
+
+      saldoRepository.findByProdutoAndDeposito.mockResolvedValue(saldo);
+      reservaRepository.create.mockImplementation(async (r) => r);
+      saldoRepository.upsert.mockImplementation(async (s) => s);
+
+      await useCase.execute(dto);
+
+      expect(saldoRepository.upsert).toHaveBeenCalledWith(
+        expect.any(SaldoEstoque),
+        mockTransaction,
+      );
     });
   });
 });

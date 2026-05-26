@@ -15,47 +15,53 @@ export class CreateReservaEstoqueUseCase implements BaseUseCase<CreateReservaEst
     private readonly reservaRepository: IReservaEstoqueRepository,
     @Inject('ISaldoEstoqueRepository')
     private readonly saldoRepository: ISaldoEstoqueRepository,
+    @Inject('DATABASE_CONNECTION')
+    private readonly connection: any,
   ) {}
 
   async execute(data: CreateReservaEstoqueDto): Promise<ReservaEstoque> {
-    const saldo = await this.saldoRepository.findByProdutoAndDeposito(
-      data.produtoId,
-      data.depositoId,
-    );
-
-    if (!saldo) {
-      throw new HttpException(
-        'Saldo não encontrado para o produto e depósito informados',
-        HttpStatus.NOT_FOUND,
+    return this.connection().tx(async (t) => {
+      // Leitura DENTRO da transação (evita race condition)
+      const saldo = await this.saldoRepository.findByProdutoAndDeposito(
+        data.produtoId,
+        data.depositoId,
+        t,
       );
-    }
 
-    if (saldo.disponivel < data.quantidade) {
-      throw new HttpException(
-        `Saldo disponível insuficiente. Disponível: ${saldo.disponivel}, Solicitado: ${data.quantidade}`,
-        HttpStatus.BAD_REQUEST,
-      );
-    }
+      if (!saldo) {
+        throw new HttpException(
+          'Saldo não encontrado para o produto e depósito informados',
+          HttpStatus.NOT_FOUND,
+        );
+      }
 
-    const reserva = new ReservaEstoque({
-      id: randomUUID(),
-      produtoId: data.produtoId,
-      depositoId: data.depositoId,
-      origem: data.origem,
-      origemId: data.origemId,
-      quantidade: data.quantidade,
-      status: StatusReservaEstoque.RESERVADO,
-      createdAt: new Date(),
+      if (saldo.disponivel < data.quantidade) {
+        throw new HttpException(
+          `Saldo disponível insuficiente. Disponível: ${saldo.disponivel}, Solicitado: ${data.quantidade}`,
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      const reserva = new ReservaEstoque({
+        id: randomUUID(),
+        produtoId: data.produtoId,
+        depositoId: data.depositoId,
+        origem: data.origem,
+        origemId: data.origemId,
+        quantidade: data.quantidade,
+        status: StatusReservaEstoque.RESERVADO,
+        createdAt: new Date(),
+      });
+
+      const createdReserva = await this.reservaRepository.create(reserva, t);
+
+      // Atualizar saldo reservado
+      saldo.reservado = saldo.reservado + data.quantidade;
+      saldo.updatedAt = new Date();
+
+      await this.saldoRepository.upsert(saldo, t);
+
+      return createdReserva;
     });
-
-    const createdReserva = await this.reservaRepository.create(reserva);
-
-    // Atualizar saldo reservado
-    saldo.reservado = saldo.reservado + data.quantidade;
-    saldo.updatedAt = new Date();
-
-    await this.saldoRepository.upsert(saldo);
-
-    return createdReserva;
   }
 }

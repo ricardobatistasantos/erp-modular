@@ -15,34 +15,38 @@ export class CreateInventarioUseCase implements BaseUseCase<CreateInventarioDto,
     private readonly inventarioRepository: IInventarioRepository,
     @Inject('ISaldoEstoqueRepository')
     private readonly saldoRepository: ISaldoEstoqueRepository,
+    @Inject('DATABASE_CONNECTION')
+    private readonly connection: any,
   ) {}
 
   async execute(data: CreateInventarioDto): Promise<Inventario> {
-    const inventario = new Inventario({
-      id: randomUUID(),
-      depositoId: data.depositoId,
-      status: 'ABERTO',
-      iniciadoEm: new Date(),
-      createdAt: new Date(),
-    });
-
-    const createdInventario = await this.inventarioRepository.create(inventario);
-
-    // Carregar saldos atuais do depósito e criar itens do inventário
-    const saldos = await this.saldoRepository.findByDepositoId(data.depositoId);
-
-    for (const saldo of saldos) {
-      const item = new InventarioItem({
+    return this.connection().tx(async (t) => {
+      const inventario = new Inventario({
         id: randomUUID(),
-        inventarioId: createdInventario.id,
-        produtoId: saldo.produtoId,
-        saldoSistema: saldo.saldoQuantidade,
-        saldoFisico: 0,
+        depositoId: data.depositoId,
+        status: 'ABERTO',
+        iniciadoEm: new Date(),
+        createdAt: new Date(),
       });
 
-      await this.inventarioRepository.createItem(item);
-    }
+      const createdInventario = await this.inventarioRepository.create(inventario, t);
 
-    return createdInventario;
+      // Carregar saldos atuais do depósito e criar itens do inventário
+      const saldos = await this.saldoRepository.findByDepositoId(data.depositoId, t);
+
+      for (const saldo of saldos) {
+        const item = new InventarioItem({
+          id: randomUUID(),
+          inventarioId: createdInventario.id,
+          produtoId: saldo.produtoId,
+          saldoSistema: saldo.saldoQuantidade,
+          saldoFisico: 0,
+        });
+
+        await this.inventarioRepository.createItem(item, t);
+      }
+
+      return createdInventario;
+    });
   }
 }

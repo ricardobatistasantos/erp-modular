@@ -10,8 +10,8 @@ export class ReservaEstoqueRepository implements IReservaEstoqueRepository {
     private readonly connection: any,
   ) {}
 
-  async create(reserva: ReservaEstoque): Promise<ReservaEstoque> {
-    const db = this.connection();
+  async create(reserva: ReservaEstoque, transaction?: any): Promise<ReservaEstoque> {
+    const db = transaction || this.connection();
     const row = await db.one(
       `INSERT INTO reservas_estoque (id, produto_id, deposito_id, origem, origem_id, quantidade, status, created_at)
        VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, NOW())
@@ -28,8 +28,8 @@ export class ReservaEstoqueRepository implements IReservaEstoqueRepository {
     return this.toEntity(row);
   }
 
-  async findByOrigem(origem: EstoqueOrigem, origemId: string): Promise<ReservaEstoque[]> {
-    const db = this.connection();
+  async findByOrigem(origem: EstoqueOrigem, origemId: string, transaction?: any): Promise<ReservaEstoque[]> {
+    const db = transaction || this.connection();
     const rows = await db.any(
       `SELECT * FROM reservas_estoque WHERE origem = $1 AND origem_id = $2 ORDER BY created_at DESC`,
       [origem, origemId],
@@ -37,8 +37,8 @@ export class ReservaEstoqueRepository implements IReservaEstoqueRepository {
     return rows.map((row) => this.toEntity(row));
   }
 
-  async updateStatus(id: string, status: StatusReservaEstoque): Promise<ReservaEstoque> {
-    const db = this.connection();
+  async updateStatus(id: string, status: StatusReservaEstoque, transaction?: any): Promise<ReservaEstoque> {
+    const db = transaction || this.connection();
     const row = await db.one(
       `UPDATE reservas_estoque SET status = $2 WHERE id = $1 RETURNING *`,
       [id, status],

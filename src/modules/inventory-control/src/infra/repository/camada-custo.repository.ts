@@ -9,8 +9,8 @@ export class CamadaCustoRepository implements ICamadaCustoRepository {
     private readonly connection: any,
   ) {}
 
-  async create(camada: CamadaCusto): Promise<CamadaCusto> {
-    const db = this.connection();
+  async create(camada: CamadaCusto, transaction?: any): Promise<CamadaCusto> {
+    const db = transaction || this.connection();
     const row = await db.one(
       `INSERT INTO camadas_custo (id, produto_id, movimento_id, quantidade, custo_unitario, saldo_quantidade, created_at)
        VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, NOW())
@@ -26,8 +26,8 @@ export class CamadaCustoRepository implements ICamadaCustoRepository {
     return this.toEntity(row);
   }
 
-  async findByProdutoId(produtoId: string): Promise<CamadaCusto[]> {
-    const db = this.connection();
+  async findByProdutoId(produtoId: string, transaction?: any): Promise<CamadaCusto[]> {
+    const db = transaction || this.connection();
     const rows = await db.any(
       `SELECT * FROM camadas_custo WHERE produto_id = $1 ORDER BY created_at ASC`,
       [produtoId],

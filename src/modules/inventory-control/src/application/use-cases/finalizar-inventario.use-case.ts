@@ -14,9 +14,12 @@ export class FinalizarInventarioUseCase implements BaseUseCase<FinalizarInventar
     @Inject('IInventarioRepository')
     private readonly inventarioRepository: IInventarioRepository,
     private readonly createMovimentoEstoqueUseCase: CreateMovimentoEstoqueUseCase,
+    @Inject('DATABASE_CONNECTION')
+    private readonly connection: any,
   ) {}
 
   async execute(data: FinalizarInventarioDto): Promise<Inventario> {
+    // Fase 1: Validação PRÉ-transação
     const inventario = await this.inventarioRepository.findById(data.inventarioId);
 
     if (!inventario) {
@@ -33,36 +36,31 @@ export class FinalizarInventarioUseCase implements BaseUseCase<FinalizarInventar
       );
     }
 
-    // Buscar itens do inventário
     const itens = await this.inventarioRepository.findItensByInventarioId(data.inventarioId);
 
-    // Para cada item com divergência, criar movimento de ajuste
-    for (const item of itens) {
-      const divergencia = item.divergencia;
+    // Fase 2: Transação
+    return this.connection().tx(async (t) => {
+      for (const item of itens) {
+        const divergencia = item.divergencia;
+        if (divergencia === 0) continue;
 
-      if (divergencia === 0) {
-        continue;
-      }
-
-      const tipo =
-        divergencia > 0
+        const tipo = divergencia > 0
           ? EstoqueTipoMovimento.AJUSTE_POSITIVO
           : EstoqueTipoMovimento.AJUSTE_NEGATIVO;
 
-      await this.createMovimentoEstoqueUseCase.execute({
-        produtoId: item.produtoId,
-        depositoId: inventario.depositoId,
-        tipo,
-        origem: EstoqueOrigem.INVENTARIO,
-        origemId: data.inventarioId,
-        quantidade: Math.abs(divergencia),
-        custoUnitario: 0,
-      });
-    }
+        await this.createMovimentoEstoqueUseCase.execute({
+          produtoId: item.produtoId,
+          depositoId: inventario.depositoId,
+          tipo,
+          origem: EstoqueOrigem.INVENTARIO,
+          origemId: data.inventarioId,
+          quantidade: Math.abs(divergencia),
+          custoUnitario: 0,
+        }, t);
+      }
 
-    // Finalizar inventário
-    const finalizado = await this.inventarioRepository.finalize(data.inventarioId);
-
-    return finalizado;
+      const finalizado = await this.inventarioRepository.finalize(data.inventarioId, t);
+      return finalizado;
+    });
   }
 }

@@ -29,85 +29,96 @@ export class CreateMovimentoEstoqueUseCase implements BaseUseCase<CreateMoviment
     private readonly saldoRepository: ISaldoEstoqueRepository,
     @Inject('ICamadaCustoRepository')
     private readonly camadaCustoRepository: ICamadaCustoRepository,
+    @Inject('DATABASE_CONNECTION')
+    private readonly connection: any,
   ) {}
 
-  async execute(data: CreateMovimentoEstoqueDto): Promise<MovimentoEstoque> {
-    const tipo = data.tipo as EstoqueTipoMovimento;
-    const isEntrada = TIPOS_ENTRADA.includes(tipo);
+  async execute(data: CreateMovimentoEstoqueDto, transaction?: any): Promise<MovimentoEstoque> {
+    const operation = async (t: any) => {
+      const tipo = data.tipo as EstoqueTipoMovimento;
+      const isEntrada = TIPOS_ENTRADA.includes(tipo);
 
-    const movimento = new MovimentoEstoque({
-      id: randomUUID(),
-      produtoId: data.produtoId,
-      depositoId: data.depositoId,
-      enderecoId: data.enderecoId,
-      loteId: data.loteId,
-      tipo,
-      origem: data.origem as EstoqueOrigem,
-      origemId: data.origemId,
-      quantidade: data.quantidade,
-      custoUnitario: data.custoUnitario,
-      valorTotal: data.quantidade * data.custoUnitario,
-      observacao: data.observacao,
-      usuarioId: data.usuarioId,
-      createdAt: new Date(),
-    });
-
-    const createdMovimento = await this.movimentoRepository.create(movimento);
-
-    // Atualizar saldo
-    let saldo = await this.saldoRepository.findByProdutoAndDeposito(
-      data.produtoId,
-      data.depositoId,
-    );
-
-    if (!saldo) {
-      saldo = new SaldoEstoque({
+      const movimento = new MovimentoEstoque({
         id: randomUUID(),
         produtoId: data.produtoId,
         depositoId: data.depositoId,
         enderecoId: data.enderecoId,
         loteId: data.loteId,
-        saldoQuantidade: 0,
-        reservado: 0,
-        custoMedio: 0,
-        updatedAt: new Date(),
-      });
-    }
-
-    if (isEntrada) {
-      const novoSaldoQuantidade = saldo.saldoQuantidade + data.quantidade;
-      const custoTotalAnterior = saldo.saldoQuantidade * saldo.custoMedio;
-      const custoTotalNovo = data.quantidade * data.custoUnitario;
-      const novoCustoMedio =
-        novoSaldoQuantidade > 0
-          ? (custoTotalAnterior + custoTotalNovo) / novoSaldoQuantidade
-          : data.custoUnitario;
-
-      saldo.saldoQuantidade = novoSaldoQuantidade;
-      saldo.custoMedio = novoCustoMedio;
-    } else {
-      saldo.saldoQuantidade = saldo.saldoQuantidade - data.quantidade;
-    }
-
-    saldo.updatedAt = new Date();
-
-    await this.saldoRepository.upsert(saldo);
-
-    // Se for entrada, criar camada de custo
-    if (isEntrada) {
-      const camada = new CamadaCusto({
-        id: randomUUID(),
-        produtoId: data.produtoId,
-        movimentoId: createdMovimento.id,
+        tipo,
+        origem: data.origem as EstoqueOrigem,
+        origemId: data.origemId,
         quantidade: data.quantidade,
         custoUnitario: data.custoUnitario,
-        saldoQuantidade: data.quantidade,
+        valorTotal: data.quantidade * data.custoUnitario,
+        observacao: data.observacao,
+        usuarioId: data.usuarioId,
         createdAt: new Date(),
       });
 
-      await this.camadaCustoRepository.create(camada);
-    }
+      const createdMovimento = await this.movimentoRepository.create(movimento, t);
 
-    return createdMovimento;
+      // Atualizar saldo
+      let saldo = await this.saldoRepository.findByProdutoAndDeposito(
+        data.produtoId,
+        data.depositoId,
+        t,
+      );
+
+      if (!saldo) {
+        saldo = new SaldoEstoque({
+          id: randomUUID(),
+          produtoId: data.produtoId,
+          depositoId: data.depositoId,
+          enderecoId: data.enderecoId,
+          loteId: data.loteId,
+          saldoQuantidade: 0,
+          reservado: 0,
+          custoMedio: 0,
+          updatedAt: new Date(),
+        });
+      }
+
+      if (isEntrada) {
+        const novoSaldoQuantidade = saldo.saldoQuantidade + data.quantidade;
+        const custoTotalAnterior = saldo.saldoQuantidade * saldo.custoMedio;
+        const custoTotalNovo = data.quantidade * data.custoUnitario;
+        const novoCustoMedio =
+          novoSaldoQuantidade > 0
+            ? (custoTotalAnterior + custoTotalNovo) / novoSaldoQuantidade
+            : data.custoUnitario;
+
+        saldo.saldoQuantidade = novoSaldoQuantidade;
+        saldo.custoMedio = novoCustoMedio;
+      } else {
+        saldo.saldoQuantidade = saldo.saldoQuantidade - data.quantidade;
+      }
+
+      saldo.updatedAt = new Date();
+
+      await this.saldoRepository.upsert(saldo, t);
+
+      // Se for entrada, criar camada de custo
+      if (isEntrada) {
+        const camada = new CamadaCusto({
+          id: randomUUID(),
+          produtoId: data.produtoId,
+          movimentoId: createdMovimento.id,
+          quantidade: data.quantidade,
+          custoUnitario: data.custoUnitario,
+          saldoQuantidade: data.quantidade,
+          createdAt: new Date(),
+        });
+
+        await this.camadaCustoRepository.create(camada, t);
+      }
+
+      return createdMovimento;
+    };
+
+    // Se transação externa fornecida, usa diretamente; senão, cria nova
+    if (transaction) {
+      return operation(transaction);
+    }
+    return this.connection().tx(operation);
   }
 }

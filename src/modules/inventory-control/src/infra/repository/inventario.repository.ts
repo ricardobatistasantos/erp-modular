@@ -10,8 +10,8 @@ export class InventarioRepository implements IInventarioRepository {
     private readonly connection: any,
   ) {}
 
-  async create(inventario: Inventario): Promise<Inventario> {
-    const db = this.connection();
+  async create(inventario: Inventario, transaction?: any): Promise<Inventario> {
+    const db = transaction || this.connection();
     const row = await db.one(
       `INSERT INTO inventarios (id, deposito_id, status, iniciado_em, finalizado_em, created_at)
        VALUES (gen_random_uuid(), $1, $2, $3, $4, NOW())
@@ -54,8 +54,8 @@ export class InventarioRepository implements IInventarioRepository {
     return this.toInventarioEntity(row);
   }
 
-  async createItem(item: InventarioItem): Promise<InventarioItem> {
-    const db = this.connection();
+  async createItem(item: InventarioItem, transaction?: any): Promise<InventarioItem> {
+    const db = transaction || this.connection();
     const row = await db.one(
       `INSERT INTO inventario_itens (id, inventario_id, produto_id, saldo_sistema, saldo_fisico)
        VALUES (gen_random_uuid(), $1, $2, $3, $4)
@@ -65,8 +65,8 @@ export class InventarioRepository implements IInventarioRepository {
     return this.toItemEntity(row);
   }
 
-  async finalize(id: string): Promise<Inventario> {
-    const db = this.connection();
+  async finalize(id: string, transaction?: any): Promise<Inventario> {
+    const db = transaction || this.connection();
     const row = await db.one(
       `UPDATE inventarios
        SET status = 'FINALIZADO',

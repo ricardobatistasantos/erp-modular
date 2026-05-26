@@ -14,6 +14,9 @@ describe('CreateMovimentoEstoqueUseCase', () => {
   let movimentoRepository: jest.Mocked<IMovimentoEstoqueRepository>;
   let saldoRepository: jest.Mocked<ISaldoEstoqueRepository>;
   let camadaCustoRepository: jest.Mocked<ICamadaCustoRepository>;
+  let mockTransaction: any;
+  let mockTx: jest.Mock;
+  let mockConnection: jest.Mock;
 
   beforeEach(() => {
     movimentoRepository = {
@@ -34,10 +37,15 @@ describe('CreateMovimentoEstoqueUseCase', () => {
       findByProdutoId: jest.fn(),
     };
 
+    mockTransaction = {};
+    mockTx = jest.fn((callback) => callback(mockTransaction));
+    mockConnection = jest.fn(() => ({ tx: mockTx }));
+
     useCase = new CreateMovimentoEstoqueUseCase(
       movimentoRepository,
       saldoRepository,
       camadaCustoRepository,
+      mockConnection,
     );
   });
 
@@ -125,6 +133,7 @@ describe('CreateMovimentoEstoqueUseCase', () => {
           tipo: EstoqueTipoMovimento.ENTRADA_COMPRA,
           valorTotal: 250.0,
         }),
+        mockTransaction,
       );
     });
   });
@@ -147,6 +156,7 @@ describe('CreateMovimentoEstoqueUseCase', () => {
           saldoQuantidade: 10,
           custoMedio: 20.0,
         }),
+        mockTransaction,
       );
     });
 
@@ -175,6 +185,7 @@ describe('CreateMovimentoEstoqueUseCase', () => {
           saldoQuantidade: 15,
           custoMedio: expect.closeTo(23.33, 1),
         }),
+        mockTransaction,
       );
     });
 
@@ -203,6 +214,7 @@ describe('CreateMovimentoEstoqueUseCase', () => {
           saldoQuantidade: 120,
           custoMedio: expect.closeTo(16.67, 1),
         }),
+        mockTransaction,
       );
     });
 
@@ -230,6 +242,7 @@ describe('CreateMovimentoEstoqueUseCase', () => {
           expect.objectContaining({
             saldoQuantidade: 5,
           }),
+          mockTransaction,
         );
       }
     });
@@ -258,6 +271,7 @@ describe('CreateMovimentoEstoqueUseCase', () => {
         expect.objectContaining({
           saldoQuantidade: 7,
         }),
+        mockTransaction,
       );
     });
 
@@ -297,6 +311,7 @@ describe('CreateMovimentoEstoqueUseCase', () => {
           expect.objectContaining({
             saldoQuantidade: 8,
           }),
+          mockTransaction,
         );
       }
     });
@@ -342,6 +357,7 @@ describe('CreateMovimentoEstoqueUseCase', () => {
           custoUnitario: 25.0,
           saldoQuantidade: 10,
         }),
+        mockTransaction,
       );
     });
 
@@ -371,6 +387,7 @@ describe('CreateMovimentoEstoqueUseCase', () => {
         expect.objectContaining({
           movimentoId: 'mov-123',
         }),
+        mockTransaction,
       );
     });
   });

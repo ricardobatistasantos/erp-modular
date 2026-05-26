@@ -9,8 +9,8 @@ export class SaldoEstoqueRepository implements ISaldoEstoqueRepository {
     private readonly connection: any,
   ) {}
 
-  async upsert(saldo: SaldoEstoque): Promise<SaldoEstoque> {
-    const db = this.connection();
+  async upsert(saldo: SaldoEstoque, transaction?: any): Promise<SaldoEstoque> {
+    const db = transaction || this.connection();
     const row = await db.one(
       `INSERT INTO saldo_estoque (id, produto_id, deposito_id, endereco_id, lote_id, saldo_quantidade, reservado, custo_medio, updated_at)
        VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, NOW())
@@ -33,8 +33,8 @@ export class SaldoEstoqueRepository implements ISaldoEstoqueRepository {
     return this.toEntity(row);
   }
 
-  async findByProdutoId(produtoId: string): Promise<SaldoEstoque[]> {
-    const db = this.connection();
+  async findByProdutoId(produtoId: string, transaction?: any): Promise<SaldoEstoque[]> {
+    const db = transaction || this.connection();
     const rows = await db.any(
       `SELECT * FROM saldo_estoque WHERE produto_id = $1`,
       [produtoId],
@@ -42,8 +42,8 @@ export class SaldoEstoqueRepository implements ISaldoEstoqueRepository {
     return rows.map((row) => this.toEntity(row));
   }
 
-  async findByDepositoId(depositoId: string): Promise<SaldoEstoque[]> {
-    const db = this.connection();
+  async findByDepositoId(depositoId: string, transaction?: any): Promise<SaldoEstoque[]> {
+    const db = transaction || this.connection();
     const rows = await db.any(
       `SELECT * FROM saldo_estoque WHERE deposito_id = $1`,
       [depositoId],
@@ -54,8 +54,9 @@ export class SaldoEstoqueRepository implements ISaldoEstoqueRepository {
   async findByProdutoAndDeposito(
     produtoId: string,
     depositoId: string,
+    transaction?: any,
   ): Promise<SaldoEstoque | null> {
-    const db = this.connection();
+    const db = transaction || this.connection();
     const row = await db.oneOrNone(
       `SELECT * FROM saldo_estoque WHERE produto_id = $1 AND deposito_id = $2`,
       [produtoId, depositoId],

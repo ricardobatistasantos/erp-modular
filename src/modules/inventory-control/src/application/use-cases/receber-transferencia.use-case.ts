@@ -15,9 +15,12 @@ export class ReceberTransferenciaUseCase implements BaseUseCase<ReceberTransfere
     @Inject('ITransferenciaEstoqueRepository')
     private readonly transferenciaRepository: ITransferenciaEstoqueRepository,
     private readonly createMovimentoEstoqueUseCase: CreateMovimentoEstoqueUseCase,
+    @Inject('DATABASE_CONNECTION')
+    private readonly connection: any,
   ) {}
 
   async execute(data: ReceberTransferenciaDto): Promise<TransferenciaEstoque> {
+    // Fase 1: Validação PRÉ-transação
     const transferencia = await this.transferenciaRepository.findById(data.transferenciaId);
 
     if (!transferencia) {
@@ -37,38 +40,44 @@ export class ReceberTransferenciaUseCase implements BaseUseCase<ReceberTransfere
       );
     }
 
-    const itens = await this.transferenciaRepository.findItensByTransferenciaId(data.transferenciaId);
-
-    for (const item of itens) {
-      // Criar movimento de saída no depósito de origem
-      await this.createMovimentoEstoqueUseCase.execute({
-        produtoId: item.produtoId,
-        depositoId: transferencia.depositoOrigemId,
-        tipo: EstoqueTipoMovimento.TRANSFERENCIA_SAIDA,
-        origem: EstoqueOrigem.TRANSFERENCIA,
-        origemId: data.transferenciaId,
-        quantidade: item.quantidade,
-        custoUnitario: 0,
-      });
-
-      // Criar movimento de entrada no depósito de destino
-      await this.createMovimentoEstoqueUseCase.execute({
-        produtoId: item.produtoId,
-        depositoId: transferencia.depositoDestinoId,
-        tipo: EstoqueTipoMovimento.TRANSFERENCIA_ENTRADA,
-        origem: EstoqueOrigem.TRANSFERENCIA,
-        origemId: data.transferenciaId,
-        quantidade: item.quantidade,
-        custoUnitario: 0,
-      });
-    }
-
-    // Atualizar status da transferência para RECEBIDA
-    const updatedTransferencia = await this.transferenciaRepository.updateStatus(
+    const itens = await this.transferenciaRepository.findItensByTransferenciaId(
       data.transferenciaId,
-      StatusTransferenciaEstoque.RECEBIDA,
     );
 
-    return updatedTransferencia;
+    // Fase 2: Transação
+    return this.connection().tx(async (t) => {
+      for (const item of itens) {
+        // Criar movimento de saída no depósito de origem
+        await this.createMovimentoEstoqueUseCase.execute({
+          produtoId: item.produtoId,
+          depositoId: transferencia.depositoOrigemId,
+          tipo: EstoqueTipoMovimento.TRANSFERENCIA_SAIDA,
+          origem: EstoqueOrigem.TRANSFERENCIA,
+          origemId: data.transferenciaId,
+          quantidade: item.quantidade,
+          custoUnitario: 0,
+        }, t);
+
+        // Criar movimento de entrada no depósito de destino
+        await this.createMovimentoEstoqueUseCase.execute({
+          produtoId: item.produtoId,
+          depositoId: transferencia.depositoDestinoId,
+          tipo: EstoqueTipoMovimento.TRANSFERENCIA_ENTRADA,
+          origem: EstoqueOrigem.TRANSFERENCIA,
+          origemId: data.transferenciaId,
+          quantidade: item.quantidade,
+          custoUnitario: 0,
+        }, t);
+      }
+
+      // Atualizar status da transferência para RECEBIDA
+      const updatedTransferencia = await this.transferenciaRepository.updateStatus(
+        data.transferenciaId,
+        StatusTransferenciaEstoque.RECEBIDA,
+        t,
+      );
+
+      return updatedTransferencia;
+    });
   }
 }

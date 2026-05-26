@@ -10,8 +10,8 @@ export class MovimentoEstoqueRepository implements IMovimentoEstoqueRepository {
     private readonly connection: any,
   ) {}
 
-  async create(movimento: MovimentoEstoque): Promise<MovimentoEstoque> {
-    const db = this.connection();
+  async create(movimento: MovimentoEstoque, transaction?: any): Promise<MovimentoEstoque> {
+    const db = transaction || this.connection();
     const row = await db.one(
       `INSERT INTO movimentos_estoque (id, produto_id, deposito_id, endereco_id, lote_id, tipo, origem, origem_id, quantidade, custo_unitario, valor_total, observacao, usuario_id, created_at)
        VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, NOW())
@@ -34,8 +34,8 @@ export class MovimentoEstoqueRepository implements IMovimentoEstoqueRepository {
     return this.toEntity(row);
   }
 
-  async findByProdutoId(produtoId: string): Promise<MovimentoEstoque[]> {
-    const db = this.connection();
+  async findByProdutoId(produtoId: string, transaction?: any): Promise<MovimentoEstoque[]> {
+    const db = transaction || this.connection();
     const rows = await db.any(
       `SELECT * FROM movimentos_estoque WHERE produto_id = $1 ORDER BY created_at DESC`,
       [produtoId],
@@ -43,8 +43,8 @@ export class MovimentoEstoqueRepository implements IMovimentoEstoqueRepository {
     return rows.map((row) => this.toEntity(row));
   }
 
-  async findByOrigem(origem: EstoqueOrigem, origemId: string): Promise<MovimentoEstoque[]> {
-    const db = this.connection();
+  async findByOrigem(origem: EstoqueOrigem, origemId: string, transaction?: any): Promise<MovimentoEstoque[]> {
+    const db = transaction || this.connection();
     const rows = await db.any(
       `SELECT * FROM movimentos_estoque WHERE origem = $1 AND origem_id = $2 ORDER BY created_at DESC`,
       [origem, origemId],

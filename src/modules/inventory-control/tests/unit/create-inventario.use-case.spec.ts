@@ -10,6 +10,8 @@ describe('CreateInventarioUseCase', () => {
   let useCase: CreateInventarioUseCase;
   let inventarioRepository: jest.Mocked<IInventarioRepository>;
   let saldoRepository: jest.Mocked<ISaldoEstoqueRepository>;
+  let mockTransaction: any;
+  let mockConnection: any;
 
   beforeEach(() => {
     inventarioRepository = {
@@ -29,9 +31,15 @@ describe('CreateInventarioUseCase', () => {
       findByProdutoAndDeposito: jest.fn(),
     };
 
+    mockTransaction = {};
+    mockConnection = jest.fn().mockReturnValue({
+      tx: jest.fn((callback) => callback(mockTransaction)),
+    });
+
     useCase = new CreateInventarioUseCase(
       inventarioRepository,
       saldoRepository,
+      mockConnection,
     );
   });
 
@@ -83,6 +91,7 @@ describe('CreateInventarioUseCase', () => {
           depositoId: 'deposito-001',
           status: 'ABERTO',
         }),
+        mockTransaction,
       );
     });
 
@@ -108,7 +117,7 @@ describe('CreateInventarioUseCase', () => {
 
       await useCase.execute(dto);
 
-      expect(saldoRepository.findByDepositoId).toHaveBeenCalledWith('deposito-001');
+      expect(saldoRepository.findByDepositoId).toHaveBeenCalledWith('deposito-001', mockTransaction);
     });
 
     it('deve criar um InventarioItem para cada saldo encontrado', async () => {
@@ -146,6 +155,7 @@ describe('CreateInventarioUseCase', () => {
           saldoSistema: 75,
           saldoFisico: 0,
         }),
+        mockTransaction,
       );
     });
 

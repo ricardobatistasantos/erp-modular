@@ -11,7 +11,31 @@ export class TransferenciaEstoqueRepository implements ITransferenciaEstoqueRepo
     private readonly connection: any,
   ) {}
 
-  async create(transferencia: TransferenciaEstoque, itens: TransferenciaItem[]): Promise<TransferenciaEstoque> {
+  async create(transferencia: TransferenciaEstoque, itens: TransferenciaItem[], transaction?: any): Promise<TransferenciaEstoque> {
+    if (transaction) {
+      const row = await transaction.one(
+        `INSERT INTO transferencias_estoque (id, deposito_origem_id, deposito_destino_id, status, observacao, created_at)
+         VALUES (gen_random_uuid(), $1, $2, $3, $4, NOW())
+         RETURNING *`,
+        [
+          transferencia.depositoOrigemId,
+          transferencia.depositoDestinoId,
+          transferencia.status,
+          transferencia.observacao ?? null,
+        ],
+      );
+
+      for (const item of itens) {
+        await transaction.none(
+          `INSERT INTO transferencia_itens (id, transferencia_id, produto_id, quantidade)
+           VALUES (gen_random_uuid(), $1, $2, $3)`,
+          [row.id, item.produtoId, item.quantidade],
+        );
+      }
+
+      return this.toTransferenciaEntity(row);
+    }
+
     const db = this.connection();
     return db.tx(async (t) => {
       const row = await t.one(
@@ -38,8 +62,8 @@ export class TransferenciaEstoqueRepository implements ITransferenciaEstoqueRepo
     });
   }
 
-  async findById(id: string): Promise<TransferenciaEstoque | null> {
-    const db = this.connection();
+  async findById(id: string, transaction?: any): Promise<TransferenciaEstoque | null> {
+    const db = transaction || this.connection();
     const row = await db.oneOrNone(
       `SELECT * FROM transferencias_estoque WHERE id = $1`,
       [id],
@@ -47,8 +71,8 @@ export class TransferenciaEstoqueRepository implements ITransferenciaEstoqueRepo
     return row ? this.toTransferenciaEntity(row) : null;
   }
 
-  async updateStatus(id: string, status: StatusTransferenciaEstoque): Promise<TransferenciaEstoque> {
-    const db = this.connection();
+  async updateStatus(id: string, status: StatusTransferenciaEstoque, transaction?: any): Promise<TransferenciaEstoque> {
+    const db = transaction || this.connection();
     const row = await db.one(
       `UPDATE transferencias_estoque SET status = $2 WHERE id = $1 RETURNING *`,
       [id, status],
@@ -56,8 +80,8 @@ export class TransferenciaEstoqueRepository implements ITransferenciaEstoqueRepo
     return this.toTransferenciaEntity(row);
   }
 
-  async createItem(item: TransferenciaItem): Promise<TransferenciaItem> {
-    const db = this.connection();
+  async createItem(item: TransferenciaItem, transaction?: any): Promise<TransferenciaItem> {
+    const db = transaction || this.connection();
     const row = await db.one(
       `INSERT INTO transferencia_itens (id, transferencia_id, produto_id, quantidade)
        VALUES (gen_random_uuid(), $1, $2, $3)
@@ -67,8 +91,8 @@ export class TransferenciaEstoqueRepository implements ITransferenciaEstoqueRepo
     return this.toItemEntity(row);
   }
 
-  async findItensByTransferenciaId(transferenciaId: string): Promise<TransferenciaItem[]> {
-    const db = this.connection();
+  async findItensByTransferenciaId(transferenciaId: string, transaction?: any): Promise<TransferenciaItem[]> {
+    const db = transaction || this.connection();
     const rows = await db.any(
       `SELECT * FROM transferencia_itens WHERE transferencia_id = $1`,
       [transferenciaId],
