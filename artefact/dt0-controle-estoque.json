@@ -1,0 +1,490 @@
+# 📦 Controle de Estoque ERP — Payloads JSON
+
+---
+
+# 🏗️ Estrutura Geral
+
+```json
+{
+  "data": {},
+  "metadata": {},
+  "options": {}
+}
+```
+
+---
+
+# 📦 PRODUTOS
+
+## Criar Produto
+
+```json
+{
+  "codigo": "PROD-001",
+  "sku": "NOTE-001",
+  "gtin": "7890000000001",
+  "descricao": "Notebook Dell",
+  "unidadeMedida": "UN",
+  "tipoProduto": "VENDA",
+  "controlaEstoque": true,
+  "estoqueMinimo": 5,
+  "estoqueMaximo": 50,
+  "pontoReposicao": 10,
+  "ativo": true
+}
+```
+
+## Atualizar Produto
+
+```json
+{
+  "descricao": "Notebook Dell Inspiron",
+  "estoqueMinimo": 8,
+  "pontoReposicao": 15
+}
+```
+
+---
+
+# 🏢 DEPÓSITOS
+
+## Criar Depósito
+
+```json
+{
+  "empresaId": "UUID",
+  "nome": "ALMOXARIFADO CENTRAL",
+  "ativo": true
+}
+```
+
+---
+
+# 📍 ENDEREÇAMENTO
+
+## Criar Endereço
+
+```json
+{
+  "depositoId": "UUID",
+  "codigo": "A-01-02-03",
+  "descricao": "Rua A módulo 1"
+}
+```
+
+---
+
+# 🏷️ LOTES
+
+## Criar Lote
+
+```json
+{
+  "produtoId": "UUID",
+  "lote": "LOTE-2026-001",
+  "fabricacao": "2026-01-01",
+  "validade": "2027-01-01"
+}
+```
+
+---
+
+# 🔄 MOVIMENTAÇÃO DE ESTOQUE
+
+## Entrada de Compra
+
+```json
+{
+  "produtoId": "UUID",
+  "depositoId": "UUID",
+  "enderecoId": "UUID",
+  "loteId": "UUID",
+  "tipo": "ENTRADA_COMPRA",
+  "origem": "COMPRA",
+  "origemId": "UUID",
+  "quantidade": 100,
+  "custoUnitario": 25.50,
+  "observacao": "Entrada via nota fiscal",
+  "usuarioId": "UUID"
+}
+```
+
+## Saída de Venda
+
+```json
+{
+  "produtoId": "UUID",
+  "depositoId": "UUID",
+  "tipo": "SAIDA_VENDA",
+  "origem": "VENDA",
+  "origemId": "UUID",
+  "quantidade": -5,
+  "custoUnitario": 25.50,
+  "usuarioId": "UUID"
+}
+```
+
+## Ajuste Positivo
+
+```json
+{
+  "produtoId": "UUID",
+  "depositoId": "UUID",
+  "tipo": "AJUSTE_POSITIVO",
+  "origem": "MANUAL",
+  "quantidade": 10,
+  "observacao": "Divergência inventário",
+  "usuarioId": "UUID"
+}
+```
+
+## Ajuste Negativo
+
+```json
+{
+  "produtoId": "UUID",
+  "depositoId": "UUID",
+  "tipo": "AJUSTE_NEGATIVO",
+  "origem": "MANUAL",
+  "quantidade": -3,
+  "observacao": "Produto avariado",
+  "usuarioId": "UUID"
+}
+```
+
+## Transferência Saída
+
+```json
+{
+  "produtoId": "UUID",
+  "depositoId": "DEPOSITO_ORIGEM",
+  "tipo": "TRANSFERENCIA_SAIDA",
+  "origem": "TRANSFERENCIA",
+  "origemId": "UUID_TRANSFERENCIA",
+  "quantidade": -20,
+  "usuarioId": "UUID"
+}
+```
+
+## Transferência Entrada
+
+```json
+{
+  "produtoId": "UUID",
+  "depositoId": "DEPOSITO_DESTINO",
+  "tipo": "TRANSFERENCIA_ENTRADA",
+  "origem": "TRANSFERENCIA",
+  "origemId": "UUID_TRANSFERENCIA",
+  "quantidade": 20,
+  "usuarioId": "UUID"
+}
+```
+
+---
+
+# 🔒 RESERVA DE ESTOQUE
+
+## Criar Reserva
+
+```json
+{
+  "produtoId": "UUID",
+  "depositoId": "UUID",
+  "origem": "PEDIDO_VENDA",
+  "origemId": "UUID",
+  "quantidade": 10,
+  "status": "RESERVADO"
+}
+```
+
+## Atualizar Reserva
+
+```json
+{
+  "status": "FATURADO"
+}
+```
+
+---
+
+# 🚚 TRANSFERÊNCIAS
+
+## Criar Transferência
+
+```json
+{
+  "depositoOrigemId": "UUID",
+  "depositoDestinoId": "UUID",
+  "observacao": "Transferência filial"
+}
+```
+
+## Adicionar Item Transferência
+
+```json
+{
+  "produtoId": "UUID",
+  "quantidade": 50
+}
+```
+
+## Atualizar Status Transferência
+
+```json
+{
+  "status": "EM_TRANSITO"
+}
+```
+
+---
+
+# 🧪 INVENTÁRIO
+
+## Criar Inventário
+
+```json
+{
+  "depositoId": "UUID",
+  "status": "ABERTO"
+}
+```
+
+## Adicionar Item Inventário
+
+```json
+{
+  "produtoId": "UUID",
+  "saldoSistema": 100,
+  "saldoFisico": 98
+}
+```
+
+## Finalizar Inventário
+
+```json
+{
+  "status": "FINALIZADO",
+  "finalizadoEm": "2026-05-26T15:00:00"
+}
+```
+
+---
+
+# 🏭 ALMOXARIFADO
+
+## Criar Requisição
+
+```json
+{
+  "solicitanteId": "UUID",
+  "setorId": "UUID",
+  "observacao": "Solicitação TI"
+}
+```
+
+## Adicionar Item Requisição
+
+```json
+{
+  "produtoId": "UUID",
+  "quantidade": 2
+}
+```
+
+## Aprovar Requisição
+
+```json
+{
+  "status": "APROVADA",
+  "aprovadorId": "UUID"
+}
+```
+
+## Separar Requisição
+
+```json
+{
+  "status": "SEPARANDO"
+}
+```
+
+## Entregar Material
+
+```json
+{
+  "status": "ATENDIDA",
+  "recebidoPor": "UUID",
+  "entregueEm": "2026-05-26T16:00:00"
+}
+```
+
+---
+
+# 🔧 CONTROLE DE FERRAMENTAS
+
+## Retirada Ferramenta
+
+```json
+{
+  "funcionarioId": "UUID",
+  "produtoId": "UUID",
+  "quantidade": 1,
+  "retiradoEm": "2026-05-26T08:00:00"
+}
+```
+
+## Devolução Ferramenta
+
+```json
+{
+  "devolvidoEm": "2026-05-26T18:00:00"
+}
+```
+
+---
+
+# 📊 CONSULTAS
+
+## Consultar Saldo
+
+```json
+{
+  "produtoId": "UUID",
+  "depositoId": "UUID"
+}
+```
+
+### Resposta
+
+```json
+{
+  "produtoId": "UUID",
+  "saldoQuantidade": 150,
+  "reservado": 20,
+  "disponivel": 130,
+  "custoMedio": 25.50
+}
+```
+
+## Consultar Movimentações
+
+```json
+{
+  "produtoId": "UUID",
+  "dataInicio": "2026-05-01",
+  "dataFim": "2026-05-31",
+  "tipo": "SAIDA_VENDA"
+}
+```
+
+---
+
+# 📈 EVENTOS ASSÍNCRONOS
+
+## estoque.movimentado
+
+```json
+{
+  "movimentoId": "UUID",
+  "produtoId": "UUID",
+  "tipo": "SAIDA_VENDA",
+  "quantidade": -5
+}
+```
+
+## estoque.minimo.atingido
+
+```json
+{
+  "produtoId": "UUID",
+  "saldoAtual": 3,
+  "estoqueMinimo": 5
+}
+```
+
+## requisicao.aprovada
+
+```json
+{
+  "requisicaoId": "UUID",
+  "aprovadorId": "UUID"
+}
+```
+
+## inventario.finalizado
+
+```json
+{
+  "inventarioId": "UUID",
+  "divergencias": 12
+}
+```
+
+---
+
+# 🧠 ENUMS SUGERIDOS
+
+## Tipo Movimento
+
+```text
+ENTRADA_COMPRA
+SAIDA_VENDA
+ENTRADA_DEVOLUCAO
+SAIDA_DEVOLUCAO
+AJUSTE_POSITIVO
+AJUSTE_NEGATIVO
+TRANSFERENCIA_ENTRADA
+TRANSFERENCIA_SAIDA
+PRODUCAO_ENTRADA
+PRODUCAO_CONSUMO
+CONSUMO_INTERNO
+PERDA
+AVARIA
+INVENTARIO
+```
+
+## Status Requisição
+
+```text
+ABERTA
+APROVADA
+SEPARANDO
+ATENDIDA
+PARCIAL
+CANCELADA
+```
+
+## Status Reserva
+
+```text
+RESERVADO
+SEPARADO
+FATURADO
+CANCELADO
+```
+
+## Status Transferência
+
+```text
+CRIADA
+SEPARADA
+EM_TRANSITO
+RECEBIDA
+CANCELADA
+```
+
+---
+
+# 🚀 ESTRUTURA DE PASTAS DTO
+
+```text
+stock/
+├── application
+│   ├── dto
+│   │   ├── products
+│   │   ├── movements
+│   │   ├── reservations
+│   │   ├── inventories
+│   │   ├── transfers
+│   │   └── warehouse
+```

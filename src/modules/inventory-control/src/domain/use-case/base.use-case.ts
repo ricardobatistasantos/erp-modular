@@ -1,3 +1,3 @@
-export interface BaseUseCase<I, O> {
-  execute(data: I): Promise<O>;
+export interface BaseUseCase<Input, Output> {
+  execute(data: Input): Promise<Output>;
 }

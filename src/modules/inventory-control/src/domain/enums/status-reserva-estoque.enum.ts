@@ -1,0 +1,6 @@
+export enum StatusReservaEstoque {
+  RESERVADO = 'RESERVADO',
+  SEPARADO = 'SEPARADO',
+  FATURADO = 'FATURADO',
+  CANCELADO = 'CANCELADO',
+}
